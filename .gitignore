@@ -1,0 +1,39 @@
+# Laravel backend
+back-end-app/store-maestro-back/vendor/
+back-end-app/store-maestro-back/.env
+back-end-app/store-maestro-back/storage/logs/*.log
+back-end-app/store-maestro-back/storage/framework/cache/
+back-end-app/store-maestro-back/storage/framework/sessions/
+back-end-app/store-maestro-back/storage/framework/views/
+back-end-app/store-maestro-back/bootstrap/cache/*.php
+back-end-app/store-maestro-back/public/storage
+
+# Node / React
+front-end-app-restaurant/zazaTJ/node_modules/
+front-end-app-restaurant/zazaTJ/dist/
+front-end-app-restaurant/zazaTJ/.env
+front-end-app-restaurant/zazaTJ/.env.local
+
+# Flutter — Driver
+front-end-app-delivery/Zaza\ Driver/zaza_driver_app/.dart_tool/
+front-end-app-delivery/Zaza\ Driver/zaza_driver_app/build/
+front-end-app-delivery/Zaza\ Driver/zaza_driver_app/.flutter-plugins
+front-end-app-delivery/Zaza\ Driver/zaza_driver_app/.flutter-plugins-dependencies
+
+# Flutter — Customer
+front-end-customer-app/ZaZaGoo/zaza_app/.dart_tool/
+front-end-customer-app/ZaZaGoo/zaza_app/build/
+front-end-customer-app/ZaZaGoo/zaza_app/.flutter-plugins
+front-end-customer-app/ZaZaGoo/zaza_app/.flutter-plugins-dependencies
+
+# Customer driver copy
+front-end-customer-app/Zaza/
+
+# macOS
+.DS_Store
+**/.DS_Store
+
+# IDE
+.idea/
+.vscode/settings.json
+*.iml
