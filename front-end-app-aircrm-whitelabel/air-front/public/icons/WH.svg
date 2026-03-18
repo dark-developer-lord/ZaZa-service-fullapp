@@ -1,0 +1,8 @@
+<svg viewBox="0 0 119 119" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path d="M59.4998 34.375L81.8332 46.9375V72.0625L59.4998 84.625L37.1665 72.0625V46.9375L59.4998 34.375Z" stroke="currentColor" stroke-width="3.81646" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M59.5 59.5L81.8333 46.9375" stroke="currentColor" stroke-width="3.81646" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M59.5 59.5V84.625" stroke="currentColor" stroke-width="3.81646" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M59.4998 59.5L37.1665 46.9375" stroke="currentColor" stroke-width="3.81646" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M70.6668 40.6562L48.3335 53.2188" stroke="currentColor" stroke-width="3.81646" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M93.5 119H25.4999C11.44 119 0 107.56 0 93.5001V26.0104C0 24.4456 1.26851 23.1771 2.83324 23.1771C4.39797 23.1771 5.66648 24.4456 5.66648 26.0104V93.5001C5.66648 104.437 14.564 113.334 25.4999 113.334H93.5C104.437 113.334 113.333 104.437 113.333 93.5001V25.4999C113.333 14.5632 104.437 5.66648 93.5 5.66648H3.54117C1.97644 5.66648 0.707928 4.39797 0.707928 2.83324C0.707928 1.26851 1.97644 0 3.54117 0H93.5C107.561 0 119 11.44 119 25.4999V93.5001C119 107.56 107.561 119 93.5 119Z" fill="currentColor"/>
+</svg>

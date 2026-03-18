@@ -1,0 +1,1 @@
+export { PageLazy as ChatsPage } from './ui/page-lazy'

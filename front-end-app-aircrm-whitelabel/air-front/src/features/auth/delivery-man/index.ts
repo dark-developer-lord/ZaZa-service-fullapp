@@ -1,0 +1,1 @@
+export { useGetProfile as useGetDeliveryManProfile} from './profile/api/get-profile'

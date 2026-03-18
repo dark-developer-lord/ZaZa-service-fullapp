@@ -1,0 +1,1 @@
+export { CustomerInfoCard } from './ui'

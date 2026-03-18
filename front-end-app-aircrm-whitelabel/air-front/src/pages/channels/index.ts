@@ -1,0 +1,1 @@
+export { PageLazy as ChannelsPage } from './ui/page-lazy'

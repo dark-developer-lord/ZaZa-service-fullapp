@@ -1,0 +1,1 @@
+export { PageLazy as DeliveryManLoginPage } from './ui/page-lazy'

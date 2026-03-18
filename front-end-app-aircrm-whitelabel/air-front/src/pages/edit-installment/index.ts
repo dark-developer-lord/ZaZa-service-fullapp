@@ -1,0 +1,1 @@
+export { PageLazy as InstallmentEditPage } from './ui/page-lazy'

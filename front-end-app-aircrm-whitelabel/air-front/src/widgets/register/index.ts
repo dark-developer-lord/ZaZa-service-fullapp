@@ -1,0 +1,1 @@
+export { Ui as Register } from './ui'

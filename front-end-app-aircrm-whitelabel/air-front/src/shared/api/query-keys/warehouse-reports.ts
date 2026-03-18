@@ -1,0 +1,22 @@
+export enum WarehouseReports {
+    getAllProducts = 'get-all-products',
+    getProducts = 'get-products',
+    getReceipts = 'get-receipts',
+    getReceipt_ = 'get-receipt',
+    createReceipt = 'create-receipt',
+    updateReceipt_= 'update-receipt',
+    getSales = 'get-sales',
+    getTransfers = 'get-transfers',
+    getTransfer_ = 'get-transfer',
+    createTransfer = 'create-transfer',
+    updateTransfer_ = 'update-transfer',
+    getTransferTypes = 'get-transfer-types',
+    getTransferStatuses = 'get-transfer-statuses',
+    updateTransferStatus_ = 'update-transfer-status',
+    searchVendors = 'search-vendors',
+    getIncomingTransfers = 'get-incoming-transfers',
+    getIncomingTransfersCount = 'get-incoming-transfers-count',
+    acceptIncomingTransfer_ = 'accept-incoming-transfer',
+    getInventory = 'get-inventory',
+  }
+  
