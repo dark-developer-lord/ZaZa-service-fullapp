@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ZaZa API - Swagger Documentation</title>
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/swagger-ui-dist@3/swagger-ui.css" >
+    <link rel="icon" type="image/png" href="https://fastapi.tiangolo.com/img/favicon.png" sizes="32x32" />
+    <style>
+        html {
+            box-sizing: border-box;
+            overflow: -moz-scrollbars-vertical;
+            overflow-y: scroll;
+        }
+        *,
+        *:before,
+        *:after {
+            box-sizing: inherit;
+        }
+        body {
+            margin:0;
+            padding: 0;
+            background: #fafafa;
+        }
+        .swagger-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .swagger-header h1 {
+            margin: 0;
+            font-size: 2.5em;
+            font-weight: bold;
+        }
+        .swagger-header p {
+            margin: 10px 0 0 0;
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+        .swagger-header a {
+            color: #fff;
+            text-decoration: none;
+            margin-top: 10px;
+            display: inline-block;
+            padding: 8px 16px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 4px;
+            transition: background 0.3s;
+        }
+        .swagger-header a:hover {
+            background: rgba(255,255,255,0.3);
+        }
+    </style>
+</head>
+<body>
+    <div class="swagger-header">
+        <h1>🍽️ ZaZa Service API</h1>
+        <p>Complete Food Delivery API Documentation</p>
+        <p style="font-size: 0.9em; margin-top: 15px;">
+            <a href="https://github.com/dark-developer-lord/ZaZa-service-fullapp" target="_blank">📦 GitHub Repository</a>
+            <a href="./API.md" target="_blank">📖 Full API Docs</a>
+        </p>
+    </div>
+    <div id="swagger-ui"></div>
+    <script src="https://cdn.jsdelivr.net/npm/swagger-ui-dist@3/swagger-ui-bundle.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/swagger-ui-dist@3/swagger-ui-standalone-preset.js"></script>
+    <script>
+        SwaggerUIBundle({
+            url: "./swagger.json",
+            dom_id: '#swagger-ui',
+            presets: [
+                SwaggerUIBundle.presets.apis,
+                SwaggerUIStandalonePreset
+            ],
+            layout: "BaseLayout",
+            requestInterceptor: (request) => {
+                request.headers['X-ExampleHeader'] = 'ZaZa-API';
+                return request;
+            }
+        });
+    </script>
+</body>
+</html>
