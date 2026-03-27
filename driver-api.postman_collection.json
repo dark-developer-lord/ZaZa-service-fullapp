@@ -1,0 +1,509 @@
+{
+  "info": {
+    "_postman_id": "driver-app-collection",
+    "name": "ZaZa Driver App API",
+    "description": "Complete API collection for ZaZa Driver Delivery App (iOS/Android Flutter)\nIncludes authentication, order management, real-time location tracking, and earnings",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Authentication",
+      "item": [
+        {
+          "name": "Send OTP",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"phone\": \"+992912345678\"}"
+            },
+            "url": {
+              "raw": "{{base_url}}/driver/auth/send-otp",
+              "host": ["{{base_url}}"],
+              "path": ["driver", "auth", "send-otp"]
+            }
+          }
+        },
+        {
+          "name": "Verify OTP",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.environment.set('driver_token', jsonData.data.token);",
+                  "    pm.test('Driver token saved', function () {",
+                  "        pm.expect(jsonData.data.token).to.exist;",
+                  "    });",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"phone\": \"+992912345678\", \"otp\": \"123456\"}"
+            },
+            "url": {
+              "raw": "{{base_url}}/driver/auth/verify-otp",
+              "host": ["{{base_url}}"],
+              "path": ["driver", "auth", "verify-otp"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Driver Profile",
+      "item": [
+        {
+          "name": "Get Profile",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{driver_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/driver/profile?token={{driver_token}}",
+              "host": ["{{base_url}}"],
+              "path": ["driver", "profile"],
+              "query": [
+                {
+                  "key": "token",
+                  "value": "{{driver_token}}"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Update Profile",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{driver_token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"firstname\": \"Ahmad\", \"lastname\": \"Driver\", \"vehicle_type\": \"car\", \"vehicle_number\": \"ABC-123\"}"
+            },
+            "url": {
+              "raw": "{{base_url}}/driver/profile?token={{driver_token}}",
+              "host": ["{{base_url}}"],
+              "path": ["driver", "profile"],
+              "query": [
+                {
+                  "key": "token",
+                  "value": "{{driver_token}}"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Location Tracking",
+      "item": [
+        {
+          "name": "Update Location",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{driver_token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"latitude\": 38.5598, \"longitude\": 68.7738, \"accuracy\": 5.5, \"speed\": 20.5, \"heading\": 45.0}"
+            },
+            "url": {
+              "raw": "{{base_url}}/driver/location?token={{driver_token}}",
+              "host": ["{{base_url}}"],
+              "path": ["driver", "location"],
+              "query": [
+                {
+                  "key": "token",
+                  "value": "{{driver_token}}"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Current Location",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{driver_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/driver/location?token={{driver_token}}",
+              "host": ["{{base_url}}"],
+              "path": ["driver", "location"],
+              "query": [
+                {
+                  "key": "token",
+                  "value": "{{driver_token}}"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Orders",
+      "item": [
+        {
+          "name": "Get Available Orders",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{driver_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/driver/orders/available?token={{driver_token}}&latitude=38.5598&longitude=68.7738&radius=5&page=1",
+              "host": ["{{base_url}}"],
+              "path": ["driver", "orders", "available"],
+              "query": [
+                {
+                  "key": "token",
+                  "value": "{{driver_token}}"
+                },
+                {
+                  "key": "latitude",
+                  "value": "38.5598"
+                },
+                {
+                  "key": "longitude",
+                  "value": "68.7738"
+                },
+                {
+                  "key": "radius",
+                  "value": "5",
+                  "description": "Search radius in km"
+                },
+                {
+                  "key": "page",
+                  "value": "1"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Active Orders",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{driver_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/driver/orders/active?token={{driver_token}}",
+              "host": ["{{base_url}}"],
+              "path": ["driver", "orders", "active"],
+              "query": [
+                {
+                  "key": "token",
+                  "value": "{{driver_token}}"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Accept Order",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{driver_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/driver/orders/1/accept?token={{driver_token}}",
+              "host": ["{{base_url}}"],
+              "path": ["driver", "orders", "1", "accept"],
+              "query": [
+                {
+                  "key": "token",
+                  "value": "{{driver_token}}"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Update Order Status",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{driver_token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"status\": \"on_the_way\", \"notes\": \"Order picked up from restaurant\"}"
+            },
+            "url": {
+              "raw": "{{base_url}}/driver/orders/1/status?token={{driver_token}}",
+              "host": ["{{base_url}}"],
+              "path": ["driver", "orders", "1", "status"],
+              "query": [
+                {
+                  "key": "token",
+                  "value": "{{driver_token}}"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Complete Delivery",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{driver_token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"latitude\": 38.5598, \"longitude\": 68.7738, \"notes\": \"Delivered successfully\"}"
+            },
+            "url": {
+              "raw": "{{base_url}}/driver/orders/1/complete?token={{driver_token}}",
+              "host": ["{{base_url}}"],
+              "path": ["driver", "orders", "1", "complete"],
+              "query": [
+                {
+                  "key": "token",
+                  "value": "{{driver_token}}"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Earnings",
+      "item": [
+        {
+          "name": "Get Earnings Summary",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{driver_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/driver/earnings?token={{driver_token}}&period=today",
+              "host": ["{{base_url}}"],
+              "path": ["driver", "earnings"],
+              "query": [
+                {
+                  "key": "token",
+                  "value": "{{driver_token}}"
+                },
+                {
+                  "key": "period",
+                  "value": "today"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Earnings History",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{driver_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/driver/earnings/history?token={{driver_token}}&page=1&per_page=50",
+              "host": ["{{base_url}}"],
+              "path": ["driver", "earnings", "history"],
+              "query": [
+                {
+                  "key": "token",
+                  "value": "{{driver_token}}"
+                },
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "per_page",
+                  "value": "50"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Request Withdrawal",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{driver_token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"amount\": 500.00, \"bank_account\": \"1234567890\", \"payment_method\": \"bank_transfer\"}"
+            },
+            "url": {
+              "raw": "{{base_url}}/driver/earnings/withdraw?token={{driver_token}}",
+              "host": ["{{base_url}}"],
+              "path": ["driver", "earnings", "withdraw"],
+              "query": [
+                {
+                  "key": "token",
+                  "value": "{{driver_token}}"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Ratings & Status",
+      "item": [
+        {
+          "name": "Get Ratings",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{driver_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/driver/ratings?token={{driver_token}}",
+              "host": ["{{base_url}}"],
+              "path": ["driver", "ratings"],
+              "query": [
+                {
+                  "key": "token",
+                  "value": "{{driver_token}}"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Update Status",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{driver_token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\"status\": \"active\"}"
+            },
+            "url": {
+              "raw": "{{base_url}}/driver/status?token={{driver_token}}",
+              "host": ["{{base_url}}"],
+              "path": ["driver", "status"],
+              "query": [
+                {
+                  "key": "token",
+                  "value": "{{driver_token}}"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:8000/api/v1",
+      "type": "string"
+    },
+    {
+      "key": "driver_token",
+      "value": "",
+      "type": "string"
+    }
+  ]
+}
