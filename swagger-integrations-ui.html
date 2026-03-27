@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ZaZa Server-to-Server Integrations API</title>
+    <link rel="stylesheet" type="text/css" href="https://unpkg.com/swagger-ui-dist@3/swagger-ui.css">
+    <style>
+        html {
+            box-sizing: border-box;
+            overflow: -moz-scrollbars-vertical;
+            overflow-y: scroll;
+        }
+        *, *:before, *:after {
+            box-sizing: inherit;
+        }
+        body {
+            margin: 0;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        .topbar {
+            background-color: rgba(0, 0, 0, 0.15);
+            padding: 12px 20px;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+        .topbar h1 {
+            margin: 0;
+            color: white;
+            font-size: 24px;
+            font-weight: 600;
+        }
+        .topbar span {
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 14px;
+            background-color: rgba(255, 255, 255, 0.1);
+            padding: 6px 12px;
+            border-radius: 4px;
+        }
+        .swagger-ui {
+            max-width: 100%;
+        }
+        .swagger-ui .topbar {
+            display: none;
+        }
+        .swagger-ui .info {
+            margin: 30px 0 20px 0;
+        }
+        .swagger-ui .info .title {
+            font-size: 36px;
+            margin: 0 0 15px 0;
+            color: #667eea;
+        }
+        .swagger-ui .info .description {
+            color: #666;
+            font-size: 15px;
+            line-height: 1.6;
+        }
+        .swagger-ui .scheme-container {
+            background: #f7f7f7;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 6px;
+        }
+        .swagger-ui .btn {
+            background-color: #667eea;
+            border-color: #667eea;
+            color: white;
+        }
+        .swagger-ui .btn:hover {
+            background-color: #764ba2;
+            border-color: #764ba2;
+        }
+        .swagger-ui .model-container {
+            background: #f9f9f9;
+            border-radius: 6px;
+            margin: 10px 0;
+        }
+        .swagger-ui table tbody tr:nth-child(odd) {
+            background-color: #f9f9f9;
+        }
+        .swagger-ui .try-out button {
+            background-color: #667eea;
+        }
+        .swagger-ui .try-out button:hover {
+            background-color: #764ba2;
+        }
+        .tag-section {
+            margin: 20px 0;
+        }
+        .tag-section .tag {
+            display: inline-block;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-bottom: 15px;
+        }
+    </style>
+</head>
+<body>
+    <div class="topbar">
+        <h1>🔌 ZaZa Server-to-Server Integrations</h1>
+        <span>Backend External Service API Documentation</span>
+    </div>
+    <div id="swagger-ui"></div>
+    <script src="https://unpkg.com/swagger-ui-dist@3/swagger-ui-bundle.js"></script>
+    <script src="https://unpkg.com/swagger-ui-dist@3/swagger-ui-standalone-preset.js"></script>
+    <script>
+        window.onload = function() {
+            SwaggerUIBundle({
+                url: "./swagger-server-integrations.json",
+                dom_id: '#swagger-ui',
+                presets: [
+                    SwaggerUIBundle.presets.apis,
+                    SwaggerUIStandalonePreset
+                ],
+                layout: "BaseLayout",
+                requestInterceptor: (request) => {
+                    request.headers['Content-Type'] = 'application/json';
+                    return request;
+                }
+            })
+        }
+    </script>
+</body>
+</html>

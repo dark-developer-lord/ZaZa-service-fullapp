@@ -1,0 +1,741 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "ZaZa Server-to-Server Integrations API",
+    "description": "Documentation for backend outbound API calls to external third-party services including SMS providers, payment gateways, email services, and push notifications.",
+    "version": "1.0.0",
+    "contact": {
+      "name": "ZaZa Development Team",
+      "email": "dev@zaza.tj"
+    }
+  },
+  "servers": [
+    {
+      "url": "https://api.zaza.tj/api/v1",
+      "description": "Production Server"
+    },
+    {
+      "url": "http://localhost:8000/api/v1",
+      "description": "Development Server"
+    }
+  ],
+  "tags": [
+    {
+      "name": "SMS Services",
+      "description": "OTP and SMS delivery via Nexmo (Vonage) and Oson SMS"
+    },
+    {
+      "name": "Payment Gateways",
+      "description": "Payment processing via Razorpay, PayPal, SSLCommerz, Paytm, Flutterwave"
+    },
+    {
+      "name": "Email Service",
+      "description": "Email sending via SMTP with Laravel Mail service"
+    },
+    {
+      "name": "Push Notifications",
+      "description": "Push notifications via Firebase Cloud Messaging"
+    },
+    {
+      "name": "Storage",
+      "description": "File storage via Azure, AWS S3, or Local filesystem"
+    },
+    {
+      "name": "AI Services",
+      "description": "AI integrations via OpenAI API"
+    }
+  ],
+  "paths": {
+    "/internal/sms/send-otp": {
+      "post": {
+        "tags": ["SMS Services"],
+        "summary": "Send OTP via SMS",
+        "description": "Sends a one-time password to customer or driver phone number. Uses Nexmo/Vonage as primary provider with Oson SMS as fallback.",
+        "operationId": "sendOTP",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "phone": {
+                    "type": "string",
+                    "description": "Phone number in international format",
+                    "example": "+992901234567"
+                  },
+                  "user_type": {
+                    "type": "string",
+                    "enum": ["customer", "driver", "vendor"],
+                    "description": "Type of user requesting OTP"
+                  },
+                  "length": {
+                    "type": "integer",
+                    "default": 6,
+                    "description": "OTP length (digits)"
+                  }
+                },
+                "required": ["phone", "user_type"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OTP sent successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean"
+                    },
+                    "message": {
+                      "type": "string"
+                    },
+                    "reference": {
+                      "type": "string",
+                      "description": "Reference ID for OTP verification"
+                    },
+                    "provider": {
+                      "type": "string",
+                      "enum": ["nexmo", "oson"],
+                      "description": "Which SMS provider was used"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid phone number or user type"
+          },
+          "503": {
+            "description": "SMS service unavailable (all providers failed)"
+          }
+        }
+      }
+    },
+    "/internal/payment/razorpay/create-order": {
+      "post": {
+        "tags": ["Payment Gateways"],
+        "summary": "Create Razorpay Payment Order",
+        "description": "Creates a payment order in Razorpay system for Indian customers. Used for wallet top-ups and order payments.",
+        "operationId": "createRazorpayOrder",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "amount": {
+                    "type": "number",
+                    "format": "float",
+                    "description": "Amount in INR (Paise)",
+                    "example": 10000
+                  },
+                  "currency": {
+                    "type": "string",
+                    "default": "INR",
+                    "enum": ["INR"]
+                  },
+                  "customer_id": {
+                    "type": "integer",
+                    "description": "ZaZa customer ID"
+                  },
+                  "order_type": {
+                    "type": "string",
+                    "enum": ["wallet_topup", "order_payment"],
+                    "description": "Type of payment"
+                  },
+                  "description": {
+                    "type": "string",
+                    "example": "Order #12345 - Food Delivery"
+                  }
+                },
+                "required": ["amount", "customer_id", "order_type"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Razorpay order created successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "razorpay_order_id": {
+                      "type": "string",
+                      "example": "order_1Aa00000000001"
+                    },
+                    "amount": {
+                      "type": "integer",
+                      "description": "Amount in Paise"
+                    },
+                    "currency": {
+                      "type": "string"
+                    },
+                    "status": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid payment request"
+          }
+        }
+      }
+    },
+    "/internal/payment/razorpay/verify": {
+      "post": {
+        "tags": ["Payment Gateways"],
+        "summary": "Verify Razorpay Payment Signature",
+        "description": "Verifies the signature from Razorpay webhook to ensure payment legitimacy",
+        "operationId": "verifyRazorpayPayment",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "razorpay_order_id": {
+                    "type": "string",
+                    "example": "order_1Aa00000000001"
+                  },
+                  "razorpay_payment_id": {
+                    "type": "string",
+                    "example": "pay_1Aa00000000001"
+                  },
+                  "razorpay_signature": {
+                    "type": "string",
+                    "description": "HMAC-SHA256 signature"
+                  }
+                },
+                "required": ["razorpay_order_id", "razorpay_payment_id", "razorpay_signature"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Payment signature verified successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "valid": {
+                      "type": "boolean"
+                    },
+                    "payment_id": {
+                      "type": "string"
+                    },
+                    "status": {
+                      "type": "string",
+                      "enum": ["captured", "authorized"]
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid or tampered signature"
+          }
+        }
+      }
+    },
+    "/internal/payment/paypal/create-transaction": {
+      "post": {
+        "tags": ["Payment Gateways"],
+        "summary": "Create PayPal Transaction",
+        "description": "Creates a payment transaction via PayPal for international customers",
+        "operationId": "createPayPalTransaction",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "amount": {
+                    "type": "number",
+                    "format": "float",
+                    "example": 100.00
+                  },
+                  "currency": {
+                    "type": "string",
+                    "enum": ["USD", "EUR", "GBP"],
+                    "default": "USD"
+                  },
+                  "customer_email": {
+                    "type": "string",
+                    "format": "email"
+                  },
+                  "description": {
+                    "type": "string"
+                  },
+                  "return_url": {
+                    "type": "string",
+                    "format": "uri"
+                  },
+                  "cancel_url": {
+                    "type": "string",
+                    "format": "uri"
+                  }
+                },
+                "required": ["amount", "currency", "customer_email"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "PayPal transaction created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "transaction_id": {
+                      "type": "string"
+                    },
+                    "paypal_link": {
+                      "type": "string",
+                      "format": "uri",
+                      "description": "URL for user to complete payment"
+                    },
+                    "status": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/internal/email/send": {
+      "post": {
+        "tags": ["Email Service"],
+        "summary": "Send Email via SMTP",
+        "description": "Sends email notifications via Laravel Mail service (queue-based delivery)",
+        "operationId": "sendEmail",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "to": {
+                    "type": "string",
+                    "format": "email",
+                    "description": "Recipient email address"
+                  },
+                  "subject": {
+                    "type": "string",
+                    "example": "Order Confirmation"
+                  },
+                  "template": {
+                    "type": "string",
+                    "enum": ["order_confirmation", "password_reset", "vendor_onboarding", "payment_receipt"],
+                    "description": "Email template to use"
+                  },
+                  "data": {
+                    "type": "object",
+                    "additionalProperties": true,
+                    "description": "Template variables"
+                  },
+                  "priority": {
+                    "type": "string",
+                    "enum": ["high", "normal", "low"],
+                    "default": "normal",
+                    "description": "Email queue priority"
+                  }
+                },
+                "required": ["to", "subject", "template"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "202": {
+            "description": "Email queued for sending",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "queued": {
+                      "type": "boolean"
+                    },
+                    "job_id": {
+                      "type": "string",
+                      "description": "Laravel Queue job ID"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid email address or template"
+          }
+        }
+      }
+    },
+    "/internal/firebase/send-notification": {
+      "post": {
+        "tags": ["Push Notifications"],
+        "summary": "Send Firebase Cloud Messaging Notification",
+        "description": "Sends push notifications to customers and drivers via Firebase Cloud Messaging",
+        "operationId": "sendFirebaseNotification",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "device_tokens": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    },
+                    "description": "FCM device tokens (or use topic instead)"
+                  },
+                  "topic": {
+                    "type": "string",
+                    "description": "FCM topic (alternative to device_tokens)",
+                    "example": "customer_order_updates"
+                  },
+                  "title": {
+                    "type": "string",
+                    "example": "Order Confirmed"
+                  },
+                  "body": {
+                    "type": "string",
+                    "example": "Your order has been confirmed"
+                  },
+                  "data": {
+                    "type": "object",
+                    "additionalProperties": {
+                      "type": "string"
+                    },
+                    "description": "Custom data payload",
+                    "example": {
+                      "order_id": "12345",
+                      "action": "open_order"
+                    }
+                  },
+                  "notification_type": {
+                    "type": "string",
+                    "enum": ["order_status", "promotion", "driver_arrived", "payment_receipt"]
+                  }
+                },
+                "required": ["title", "body"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Notification sent successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean"
+                    },
+                    "message_ids": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    },
+                    "failed_tokens": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      },
+                      "description": "Tokens that failed to receive notification"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "No valid device tokens or topic provided"
+          }
+        }
+      }
+    },
+    "/internal/storage/upload": {
+      "post": {
+        "tags": ["Storage"],
+        "summary": "Upload File to Storage",
+        "description": "Uploads file to configured storage backend (Azure, AWS S3, or Local)",
+        "operationId": "uploadFile",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "file": {
+                    "type": "string",
+                    "format": "binary",
+                    "description": "File to upload"
+                  },
+                  "path": {
+                    "type": "string",
+                    "description": "Directory path in storage",
+                    "example": "products/images"
+                  },
+                  "disk": {
+                    "type": "string",
+                    "enum": ["local", "azure", "s3"],
+                    "description": "Storage disk to use"
+                  }
+                },
+                "required": ["file", "path"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "File uploaded successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "url": {
+                      "type": "string",
+                      "format": "uri",
+                      "description": "Public URL to access file"
+                    },
+                    "path": {
+                      "type": "string"
+                    },
+                    "size": {
+                      "type": "integer",
+                      "description": "File size in bytes"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid file or exceeds size limit"
+          }
+        }
+      }
+    },
+    "/internal/ai/classify": {
+      "post": {
+        "tags": ["AI Services"],
+        "summary": "Classify Text using OpenAI",
+        "description": "Uses OpenAI API to classify products, reviews, or other text content",
+        "operationId": "classifyWithAI",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "text": {
+                    "type": "string",
+                    "description": "Text to classify"
+                  },
+                  "classification_type": {
+                    "type": "string",
+                    "enum": ["product_category", "sentiment_analysis", "content_moderation"],
+                    "description": "Type of classification"
+                  },
+                  "categories": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    },
+                    "description": "Available categories for classification"
+                  }
+                },
+                "required": ["text", "classification_type"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Classification completed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "classification": {
+                      "type": "string"
+                    },
+                    "confidence": {
+                      "type": "number",
+                      "format": "float",
+                      "minimum": 0,
+                      "maximum": 1
+                    },
+                    "reasoning": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Rate limit exceeded (OpenAI quota)"
+          }
+        }
+      }
+    },
+    "/internal/webhook/razorpay": {
+      "post": {
+        "tags": ["Payment Gateways"],
+        "summary": "Razorpay Webhook Handler",
+        "description": "Receives payment status updates from Razorpay webhook",
+        "operationId": "handleRazorpayWebhook",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "event": {
+                    "type": "string",
+                    "enum": ["payment.authorized", "payment.failed", "payment.captured"],
+                    "description": "Webhook event type"
+                  },
+                  "payload": {
+                    "type": "object",
+                    "properties": {
+                      "payment": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "string"
+                          },
+                          "amount": {
+                            "type": "integer"
+                          },
+                          "status": {
+                            "type": "string"
+                          }
+                        }
+                      },
+                      "order": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "string"
+                          }
+                        }
+                      }
+                    }
+                  }
+                },
+                "required": ["event", "payload"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Webhook processed successfully"
+          },
+          "400": {
+            "description": "Invalid webhook signature"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "SMSProvider": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "enum": ["nexmo", "oson"]
+          },
+          "api_key": {
+            "type": "string",
+            "description": "Stored in .env file"
+          },
+          "api_secret": {
+            "type": "string",
+            "description": "Stored in .env file"
+          },
+          "sender_id": {
+            "type": "string"
+          }
+        }
+      },
+      "PaymentGateway": {
+        "type": "object",
+        "properties": {
+          "provider": {
+            "type": "string",
+            "enum": ["razorpay", "paypal", "sslcommerz", "paytm", "flutterwave"]
+          },
+          "credentials": {
+            "type": "object",
+            "description": "Stored securely in config files, never exposed in logs"
+          },
+          "supported_currencies": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "FirebaseConfig": {
+        "type": "object",
+        "properties": {
+          "project_id": {
+            "type": "string"
+          },
+          "service_account_key": {
+            "type": "string",
+            "description": "Path to Firebase service account JSON"
+          },
+          "topics": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "example": ["customer_order_updates", "driver_assignments", "promo_announcements"]
+          }
+        }
+      }
+    }
+  }
+}

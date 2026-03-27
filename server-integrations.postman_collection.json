@@ -1,0 +1,611 @@
+{
+  "info": {
+    "_postman_id": "zaza-server-integrations",
+    "name": "ZaZa Server-to-Server Integrations",
+    "description": "Postman collection for testing backend outbound API calls to SMS, Payment, Email, Firebase, and AI services",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "SMS Services",
+      "description": "OTP delivery via Nexmo and Oson SMS",
+      "item": [
+        {
+          "name": "Send OTP - Nexmo",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{api_token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"phone\": \"+992901234567\",\n  \"user_type\": \"customer\",\n  \"length\": 6\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/internal/sms/send-otp",
+              "host": ["{{base_url}}"],
+              "path": ["internal", "sms", "send-otp"]
+            }
+          }
+        },
+        {
+          "name": "Send OTP - Oson SMS",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{api_token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"phone\": \"+992901234567\",\n  \"user_type\": \"driver\",\n  \"length\": 4\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/internal/sms/send-otp",
+              "host": ["{{base_url}}"],
+              "path": ["internal", "sms", "send-otp"]
+            }
+          }
+        },
+        {
+          "name": "Verify OTP Code",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"phone\": \"+992901234567\",\n  \"otp\": \"123456\",\n  \"reference\": \"{{otp_reference}}\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/auth/verify-otp",
+              "host": ["{{base_url}}"],
+              "path": ["auth", "verify-otp"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Payment Gateways",
+      "description": "Razorpay, PayPal, SSLCommerz, Paytm, Flutterwave integrations",
+      "item": [
+        {
+          "name": "Razorpay - Create Order",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{api_token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"amount\": 10000,\n  \"currency\": \"INR\",\n  \"customer_id\": 1,\n  \"order_type\": \"wallet_topup\",\n  \"description\": \"Wallet Top-up - Customer\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/internal/payment/razorpay/create-order",
+              "host": ["{{base_url}}"],
+              "path": ["internal", "payment", "razorpay", "create-order"]
+            }
+          }
+        },
+        {
+          "name": "Razorpay - Verify Payment",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{api_token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"razorpay_order_id\": \"order_1Aa00000000001\",\n  \"razorpay_payment_id\": \"pay_1Aa00000000001\",\n  \"razorpay_signature\": \"9ef4dffbfd84f1318f6739a3ce19f9d85851857ae648f114332d8401e0949a3d\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/internal/payment/razorpay/verify",
+              "host": ["{{base_url}}"],
+              "path": ["internal", "payment", "razorpay", "verify"]
+            }
+          }
+        },
+        {
+          "name": "PayPal - Create Transaction",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{api_token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"amount\": 100.00,\n  \"currency\": \"USD\",\n  \"customer_email\": \"customer@example.com\",\n  \"description\": \"Order Payment - Food Delivery\",\n  \"return_url\": \"https://app.zaza.tj/payment/return\",\n  \"cancel_url\": \"https://app.zaza.tj/payment/cancel\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/internal/payment/paypal/create-transaction",
+              "host": ["{{base_url}}"],
+              "path": ["internal", "payment", "paypal", "create-transaction"]
+            }
+          }
+        },
+        {
+          "name": "SSLCommerz - Create Payment",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{api_token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"amount\": 500.00,\n  \"currency\": \"BDT\",\n  \"customer_id\": 1,\n  \"order_type\": \"order_payment\",\n  \"customer_email\": \"customer@example.com\",\n  \"customer_phone\": \"+8801234567890\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/internal/payment/sslcommerz/create-payment",
+              "host": ["{{base_url}}"],
+              "path": ["internal", "payment", "sslcommerz", "create-payment"]
+            }
+          }
+        },
+        {
+          "name": "Paytm - Create Order",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{api_token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"amount\": 2500,\n  \"currency\": \"INR\",\n  \"customer_id\": 1,\n  \"order_type\": \"wallet_topup\",\n  \"customer_email\": \"customer@example.com\",\n  \"customer_phone\": \"+919876543210\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/internal/payment/paytm/create-order",
+              "host": ["{{base_url}}"],
+              "path": ["internal", "payment", "paytm", "create-order"]
+            }
+          }
+        },
+        {
+          "name": "Flutterwave - Create Payment Link",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{api_token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"amount\": 15000,\n  \"currency\": \"NGN\",\n  \"customer_id\": 1,\n  \"customer_email\": \"customer@example.com\",\n  \"customer_phone\": \"+2341234567890\",\n  \"order_type\": \"order_payment\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/internal/payment/flutterwave/create-link",
+              "host": ["{{base_url}}"],
+              "path": ["internal", "payment", "flutterwave", "create-link"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Email Service",
+      "description": "SMTP email sending with queue support",
+      "item": [
+        {
+          "name": "Send Order Confirmation Email",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{api_token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"to\": \"customer@example.com\",\n  \"subject\": \"Order Confirmation - Order #12345\",\n  \"template\": \"order_confirmation\",\n  \"data\": {\n    \"order_id\": \"12345\",\n    \"customer_name\": \"John Doe\",\n    \"restaurant_name\": \"Pizza Paradise\",\n    \"total_amount\": \"$25.99\",\n    \"delivery_time\": \"30 minutes\"\n  },\n  \"priority\": \"high\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/internal/email/send",
+              "host": ["{{base_url}}"],
+              "path": ["internal", "email", "send"]
+            }
+          }
+        },
+        {
+          "name": "Send Password Reset Email",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{api_token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"to\": \"vendor@restaurant.com\",\n  \"subject\": \"Password Reset Request\",\n  \"template\": \"password_reset\",\n  \"data\": {\n    \"reset_link\": \"https://app.zaza.tj/reset-password?token=abc123xyz\",\n    \"expiry_time\": \"24 hours\"\n  },\n  \"priority\": \"high\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/internal/email/send",
+              "host": ["{{base_url}}"],
+              "path": ["internal", "email", "send"]
+            }
+          }
+        },
+        {
+          "name": "Send Payment Receipt",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{api_token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"to\": \"customer@example.com\",\n  \"subject\": \"Payment Receipt - Reference #PAY-2026-001\",\n  \"template\": \"payment_receipt\",\n  \"data\": {\n    \"transaction_id\": \"PAY-2026-001\",\n    \"amount\": \"$50.00\",\n    \"payment_method\": \"Razorpay\",\n    \"date\": \"2026-03-27 10:30:00\",\n    \"purpose\": \"Wallet Top-up\"\n  },\n  \"priority\": \"normal\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/internal/email/send",
+              "host": ["{{base_url}}"],
+              "path": ["internal", "email", "send"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Firebase Notifications",
+      "description": "Push notifications via Firebase Cloud Messaging",
+      "item": [
+        {
+          "name": "Send Notification - Device Tokens",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{api_token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"device_tokens\": [\n    \"dKRjP7n_DAQCZN\",\n    \"fLkJh2m_CAQAZM\"\n  ],\n  \"title\": \"Order Confirmed!\",\n  \"body\": \"Your order has been confirmed by the restaurant\",\n  \"data\": {\n    \"order_id\": \"12345\",\n    \"action\": \"open_order\",\n    \"restaurant_name\": \"Pizza Paradise\"\n  },\n  \"notification_type\": \"order_status\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/internal/firebase/send-notification",
+              "host": ["{{base_url}}"],
+              "path": ["internal", "firebase", "send-notification"]
+            }
+          }
+        },
+        {
+          "name": "Send Notification - Topic",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{api_token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"topic\": \"customer_promotions\",\n  \"title\": \"Special Offer!\",\n  \"body\": \"Get 30% off on your next order\",\n  \"data\": {\n    \"promo_code\": \"SAVE30\",\n    \"action\": \"open_promotions\",\n    \"expiry_date\": \"2026-04-27\"\n  },\n  \"notification_type\": \"promotion\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/internal/firebase/send-notification",
+              "host": ["{{base_url}}"],
+              "path": ["internal", "firebase", "send-notification"]
+            }
+          }
+        },
+        {
+          "name": "Send Driver Arrival Notification",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{api_token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"topic\": \"order_12345_updates\",\n  \"title\": \"Driver Arrived!\",\n  \"body\": \"Your driver is at the delivery location\",\n  \"data\": {\n    \"order_id\": \"12345\",\n    \"action\": \"show_driver_location\",\n    \"driver_name\": \"Ahmed\",\n    \"driver_phone\": \"+992901234567\"\n  },\n  \"notification_type\": \"driver_arrived\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/internal/firebase/send-notification",
+              "host": ["{{base_url}}"],
+              "path": ["internal", "firebase", "send-notification"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Storage Service",
+      "description": "File upload to Azure, AWS S3, or Local storage",
+      "item": [
+        {
+          "name": "Upload Restaurant Logo",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{api_token}}"
+              }
+            ],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "file",
+                  "type": "file",
+                  "src": "{{logo_file}}"
+                },
+                {
+                  "key": "path",
+                  "value": "restaurants/logos",
+                  "type": "text"
+                },
+                {
+                  "key": "disk",
+                  "value": "azure",
+                  "type": "text"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/internal/storage/upload",
+              "host": ["{{base_url}}"],
+              "path": ["internal", "storage", "upload"]
+            }
+          }
+        },
+        {
+          "name": "Upload Product Image",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{api_token}}"
+              }
+            ],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "file",
+                  "type": "file",
+                  "src": "{{product_image}}"
+                },
+                {
+                  "key": "path",
+                  "value": "products/images\",
+                  "type": "text"
+                },
+                {
+                  "key": "disk",
+                  "value": "s3",
+                  "type": "text"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/internal/storage/upload",
+              "host": ["{{base_url}}"],
+              "path": ["internal", "storage", "upload"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "AI Services",
+      "description": "OpenAI integration for text classification and analysis",
+      "item": [
+        {
+          "name": "Classify Product Category",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{api_token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"text\": \"Delicious grilled chicken breast with herb butter sauce and seasonal vegetables\",\n  \"classification_type\": \"product_category\",\n  \"categories\": [\"chicken\", \"beef\", \"seafood\", \"vegetarian\", \"dessert\"]\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/internal/ai/classify",
+              "host": ["{{base_url}}"],
+              "path": ["internal", "ai", "classify"]
+            }
+          }
+        },
+        {
+          "name": "Analyze Review Sentiment",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{api_token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"text\": \"Amazing food quality! The delivery was incredibly fast. Highly recommend this restaurant!\",\n  \"classification_type\": \"sentiment_analysis\",\n  \"categories\": [\"positive\", \"neutral\", \"negative\"]\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/internal/ai/classify",
+              "host": ["{{base_url}}"],
+              "path": ["internal", "ai", "classify"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Webhook Handlers",
+      "description": "Receive callbacks from payment providers",
+      "item": [
+        {
+          "name": "Razorpay Webhook - Payment Captured",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "X-Razorpay-Signature",
+                "value": "9ef4dffbfd84f1318f6739a3ce19f9d85851857ae648f114332d8401e0949a3d"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"event\": \"payment.captured\",\n  \"payload\": {\n    \"payment\": {\n      \"id\": \"pay_1Aa00000000001\",\n      \"amount\": 10000,\n      \"currency\": \"INR\",\n      \"status\": \"captured\",\n      \"created_at\": 1679223000\n    },\n    \"order\": {\n      \"id\": \"order_1Aa00000000001\"\n    }\n  }\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/internal/webhook/razorpay",
+              "host": ["{{base_url}}"],
+              "path": ["internal", "webhook", "razorpay"]
+            }
+          }
+        },
+        {
+          "name": "PayPal Webhook - Payment Completed",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": \"WH-1A2B3C4D5E6F7G8H9I0J\",\n  \"event_type\": \"CHECKOUT.ORDER.COMPLETED\",\n  \"create_time\": \"2026-03-27T10:30:00Z\",\n  \"resource\": {\n    \"id\": \"5O190127TN364715T\",\n    \"status\": \"COMPLETED\",\n    \"payer\": {\n      \"email_address\": \"customer@example.com\"\n    },\n    \"purchase_units\": [\n      {\n        \"reference_id\": \"order_12345\",\n        \"amount\": {\n          \"currency_code\": \"USD\",\n          \"value\": \"100.00\"\n        }\n      }\n    ]\n  }\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/internal/webhook/paypal",
+              "host": ["{{base_url}}"],
+              "path": ["internal", "webhook", "paypal"]
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:8000/api/v1",
+      "type": "string"
+    },
+    {
+      "key": "api_token",
+      "value": "",
+      "type": "string",
+      "description": "Internal API token for server-to-server calls"
+    },
+    {
+      "key": "otp_reference",
+      "value": "",
+      "type": "string"
+    }
+  ]
+}
