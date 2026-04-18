@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api\V1\Auth;
 
+use App\CentralLogics\SMS_module;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -64,8 +65,15 @@ class CustomerOtpController extends Controller
             ]
         );
 
-        // Production: send via SMS gateway
-        // SMS_module::sms_send_otp($phone, $otp);
+        if (env('APP_MODE') !== 'demo') {
+            $smsResponse = SMS_module::send($phone, $otp);
+            if ($smsResponse !== 'success') {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Failed to send OTP SMS.',
+                ], 405);
+            }
+        }
 
         $response = [
             'status'  => true,

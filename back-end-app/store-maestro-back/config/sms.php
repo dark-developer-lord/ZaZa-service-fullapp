@@ -1,7 +1,7 @@
 <?php
 
 return [
-    'provider' => env('SMS_PROVIDER', 'generic'),
+    'provider' => env('SMS_PROVIDER', 'osonsms'),
 
     'providers' => [],
 ];

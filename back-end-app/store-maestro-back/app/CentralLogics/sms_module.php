@@ -3,11 +3,19 @@
 namespace App\CentralLogics;
 
 use App\Models\BusinessSetting;
+use Illuminate\Support\Facades\Log;
+use OsonSMS\OsonSMSService\OsonSmsService;
 
 class SMS_module
 {
     public static function send($receiver, $message)
     {
+        $provider = strtolower((string) config('sms.provider', 'generic'));
+
+        if (in_array($provider, ['osonsms', 'oson_sms', 'oson'], true)) {
+            return self::oson($receiver, $message);
+        }
+
         $config = self::get_settings('log_sms');
         if (isset($config) && $config['status'] == 1) {
             self::log($receiver, $message);
@@ -19,6 +27,29 @@ class SMS_module
         }
 
         return 'not_found';
+    }
+
+    protected static function oson($receiver, $message)
+    {
+        try {
+            /** @var OsonSmsService $osonSmsService */
+            $osonSmsService = app(OsonSmsService::class);
+            $osonSmsService->sendSMS(
+                senderName: config('osonsmsservice.sender_name'),
+                phonenumber: $receiver,
+                message: (string) $message,
+                txnId: rand(1000000000, 9999999999),
+            );
+
+            return 'success';
+        } catch (\Throwable $exception) {
+            Log::error('Oson SMS send failed', [
+                'receiver' => $receiver,
+                'error' => $exception->getMessage(),
+            ]);
+
+            return 'error';
+        }
     }
 
     public static function get_settings($name)

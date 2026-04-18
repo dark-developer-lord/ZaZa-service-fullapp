@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api\V1\Auth;
 
+use App\CentralLogics\SMS_module;
 use App\Http\Controllers\Controller;
 use App\Models\DeliveryMan;
 use App\Models\DeliveryManOtp;
@@ -57,8 +58,15 @@ class DeliveryManOtpController extends Controller
             'verified'   => false,
         ]);
 
-        // TODO: Отправить через SMS-шлюз (например, Eskiz, Playmobile и т.д.)
-        // SmsService::send($phone, "Zaza Driver: ваш код $otp. Действителен 5 минут.");
+        if (env('APP_MODE') !== 'demo') {
+            $smsResponse = SMS_module::send($phone, $otp);
+            if ($smsResponse !== 'success') {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Не удалось отправить OTP по SMS.',
+                ], 405);
+            }
+        }
 
         // В dev-режиме возвращаем OTP в ответе
         $data = ['status' => true, 'message' => 'OTP отправлен на номер ' . $phone];
