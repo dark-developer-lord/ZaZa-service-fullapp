@@ -84,6 +84,7 @@ Route::group(['namespace' => 'Api\V1'], function () {
             Route::get('order-details', 'DeliverymanController@get_order_details');
             Route::get('order', 'DeliverymanController@get_order');
             Route::put('update-fcm-token', 'DeliverymanController@update_fcm_token');
+            Route::post('request-withdraw', 'DeliverymanController@request_withdraw');
             //Remove account
             Route::delete('remove-account', 'DeliverymanController@remove_account');
 
@@ -291,7 +292,9 @@ Route::group(['namespace' => 'Api\V1'], function () {
 
     // ✅ Заявки партнёров с лендинга zazaTJ (React)
     Route::group(['prefix' => 'partner-request'], function () {
-        Route::post('restaurant', 'PartnerRequestController@storeRestaurant');
-        Route::post('b2b',        'PartnerRequestController@storeB2B');
+        Route::match(['get', 'post'], 'restaurant', 'PartnerRequestController@storeRestaurant');
+        Route::match(['get', 'post'], 'b2b',        'PartnerRequestController@storeB2B');
+        Route::match(['get', 'post'], 'corporate',  'PartnerRequestController@storeCorporate');
+        Route::match(['get', 'post'], 'corporate-packages', 'PartnerRequestController@storeCorporate');
     });
 });
