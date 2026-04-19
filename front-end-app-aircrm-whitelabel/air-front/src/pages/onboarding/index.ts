@@ -1,1 +1,0 @@
-export { PageLazy as OnboardingPage } from './ui/page-lazy'

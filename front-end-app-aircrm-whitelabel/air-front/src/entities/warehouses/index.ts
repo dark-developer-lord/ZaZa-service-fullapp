@@ -1,6 +1,0 @@
-export * from './api/get-restaurant'
-export * from './api/get-restaurants'
-export * from './model/restaurant'
-export * from './model/top-restaurant'
-export { Table as WarehousesTable } from './ui/table'
-export * from './ui/top-restaurant-list'

@@ -1,6 +1,0 @@
-export * from './file-upload'
-export * from './form-input'
-export * from './form-password'
-export * from './form-select'
-export * from './ios-switch'
-export * from './toggle'

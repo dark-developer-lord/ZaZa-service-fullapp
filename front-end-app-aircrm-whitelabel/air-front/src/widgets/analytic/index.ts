@@ -1,1 +1,0 @@
-export { Marginality } from './ui/marginality'

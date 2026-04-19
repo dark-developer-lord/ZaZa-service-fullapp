@@ -1,1 +1,0 @@
-export { Ui as AnalyticTable} from "./ui/main"

@@ -1,2 +1,0 @@
-export { TransferStatusDropdown } from './ui'
-

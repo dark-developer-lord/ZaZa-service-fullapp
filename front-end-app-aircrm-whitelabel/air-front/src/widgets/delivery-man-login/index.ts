@@ -1,1 +1,0 @@
-export { Ui as DeliveryManLogin } from './ui'

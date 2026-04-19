@@ -1,1 +1,0 @@
-export { Form as RegisterForm } from './ui/form'

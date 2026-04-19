@@ -1,5 +1,0 @@
-export * from './api/get-stores-list'
-export * from './api/get-stores'
-export * from './api/get-store'
-export * from './model/store'
-export { Table as StoresTable } from './ui/table'
