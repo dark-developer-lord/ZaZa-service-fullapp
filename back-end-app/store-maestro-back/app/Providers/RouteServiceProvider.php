@@ -77,6 +77,40 @@ class RouteServiceProvider extends ServiceProvider
                 ->middleware('api')
                 ->namespace($this->namespace)
                 ->group(base_path('routes/api/v3/vendor.php'));
+
+            // Backward-compat bridge: if an endpoint is not implemented in v3,
+            // proxy it to the equivalent v1 path (same HTTP method/payload).
+            Route::prefix('api/v3')
+                ->middleware('api')
+                ->any('{path}', function (Request $request, string $path) {
+                    $queryString = $request->getQueryString();
+                    $forwardPath = '/api/v1/' . $path . ($queryString ? ('?' . $queryString) : '');
+
+                    $forwardRequest = Request::create(
+                        $forwardPath,
+                        $request->method(),
+                        $request->all(),
+                        $request->cookies->all(),
+                        $request->files->all(),
+                        $request->server->all(),
+                        $request->getContent()
+                    );
+
+                    $forwardRequest->headers->replace($request->headers->all());
+
+                    $response = app()->handle($forwardRequest);
+
+                    if ($response->getStatusCode() === 404) {
+                        return response()->json([
+                            'message' => 'Route not found in api/v3 or api/v1',
+                        ], 404);
+                    }
+
+                    $response->headers->set('X-API-Version-Compat', 'v1-via-v3');
+
+                    return $response;
+                })
+                ->where('path', '.*');
         });
     }
 
