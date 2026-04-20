@@ -1,8 +1,8 @@
 {
   "info": {
-    "_postman_id": "customer-app-collection",
+    "_postman_id": "zaza-customer-api-v2-otp-only",
     "name": "ZaZa Customer App API",
-    "description": "Complete API collection for ZaZa Customer Mobile App (iOS/Android Flutter)\nIncludes authentication, ordering, profiles, addresses, wallet, and wishlist endpoints",
+    "description": "Customer authentication collection aligned with phone+OTP-only flow (v1 and v3) plus legacy compatibility endpoints.",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "item": [
@@ -10,602 +10,269 @@
       "name": "Authentication",
       "item": [
         {
-          "name": "Send OTP",
+          "name": "V1 Sign-Up (Send OTP)",
           "request": {
             "method": "POST",
             "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
+              { "key": "Accept", "value": "application/json" },
+              { "key": "Content-Type", "value": "application/json" }
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\"phone\": \"+992912345678\"}"
+              "raw": "{\n  \"phone\": \"{{customer_phone}}\"\n}"
             },
             "url": {
-              "raw": "{{base_url}}/auth/send-otp",
+              "raw": "{{base_url}}/auth/sign-up",
               "host": ["{{base_url}}"],
-              "path": ["auth", "send-otp"]
+              "path": ["auth", "sign-up"]
             }
-          }
-        },
-        {
-          "name": "Verify OTP",
+          },
           "event": [
             {
               "listen": "test",
               "script": {
                 "exec": [
                   "if (pm.response.code === 200) {",
-                  "    var jsonData = pm.response.json();",
-                  "    pm.environment.set('customer_token', jsonData.data.token);",
-                  "    pm.test('Token saved to environment', function () {",
-                  "        pm.expect(jsonData.data.token).to.exist;",
-                  "    });",
+                  "  var data = pm.response.json();",
+                  "  if (data.otp) pm.environment.set('customer_otp', String(data.otp));",
                   "}"
                 ]
               }
             }
-          ],
+          ]
+        },
+        {
+          "name": "V1 Login (Send OTP)",
           "request": {
             "method": "POST",
             "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
+              { "key": "Accept", "value": "application/json" },
+              { "key": "Content-Type", "value": "application/json" }
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\"phone\": \"+992912345678\", \"otp\": \"123456\"}"
+              "raw": "{\n  \"phone\": \"{{customer_phone}}\"\n}"
             },
             "url": {
-              "raw": "{{base_url}}/auth/verify-otp",
+              "raw": "{{base_url}}/auth/login",
               "host": ["{{base_url}}"],
-              "path": ["auth", "verify-otp"]
+              "path": ["auth", "login"]
             }
-          }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "  var data = pm.response.json();",
+                  "  if (data.otp) pm.environment.set('customer_otp', String(data.otp));",
+                  "}"
+                ]
+              }
+            }
+          ]
         },
         {
-          "name": "Register",
+          "name": "V1 Verify Phone (Complete Login)",
           "request": {
             "method": "POST",
             "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
+              { "key": "Accept", "value": "application/json" },
+              { "key": "Content-Type", "value": "application/json" }
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\"phone\": \"+992912345678\", \"firstname\": \"John\", \"lastname\": \"Doe\", \"email\": \"john@example.com\"}"
+              "raw": "{\n  \"phone\": \"{{customer_phone}}\",\n  \"otp\": \"{{customer_otp}}\"\n}"
             },
             "url": {
-              "raw": "{{base_url}}/auth/register",
+              "raw": "{{base_url}}/auth/verify-phone",
               "host": ["{{base_url}}"],
-              "path": ["auth", "register"]
+              "path": ["auth", "verify-phone"]
             }
-          }
-        }
-      ]
-    },
-    {
-      "name": "Customer Profile",
-      "item": [
-        {
-          "name": "Get Profile",
-          "request": {
-            "method": "GET",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{customer_token}}"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "  var data = pm.response.json();",
+                  "  if (data.token) pm.environment.set('customer_token', data.token);",
+                  "}"
+                ]
               }
-            ],
-            "url": {
-              "raw": "{{base_url}}/customer/profile",
-              "host": ["{{base_url}}"],
-              "path": ["customer", "profile"]
             }
-          }
+          ]
         },
         {
-          "name": "Update Profile",
-          "request": {
-            "method": "PUT",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              },
-              {
-                "key": "Authorization",
-                "value": "Bearer {{customer_token}}"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\"firstname\": \"John\", \"lastname\": \"Doe\", \"email\": \"john.doe@example.com\"}"
-            },
-            "url": {
-              "raw": "{{base_url}}/customer/profile",
-              "host": ["{{base_url}}"],
-              "path": ["customer", "profile"]
-            }
-          }
-        }
-      ]
-    },
-    {
-      "name": "Orders",
-      "item": [
-        {
-          "name": "Get All Orders",
-          "request": {
-            "method": "GET",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{customer_token}}"
-              }
-            ],
-            "url": {
-              "raw": "{{base_url}}/customer/orders?page=1&per_page=15",
-              "host": ["{{base_url}}"],
-              "path": ["customer", "orders"],
-              "query": [
-                {
-                  "key": "page",
-                  "value": "1"
-                },
-                {
-                  "key": "per_page",
-                  "value": "15"
-                }
-              ]
-            }
-          }
-        },
-        {
-          "name": "Get Active Orders",
-          "request": {
-            "method": "GET",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{customer_token}}"
-              }
-            ],
-            "url": {
-              "raw": "{{base_url}}/customer/orders?status=on_the_way",
-              "host": ["{{base_url}}"],
-              "path": ["customer", "orders"],
-              "query": [
-                {
-                  "key": "status",
-                  "value": "on_the_way"
-                }
-              ]
-            }
-          }
-        },
-        {
-          "name": "Get Order Details",
-          "request": {
-            "method": "GET",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{customer_token}}"
-              }
-            ],
-            "url": {
-              "raw": "{{base_url}}/customer/orders/{{order_id}}",
-              "host": ["{{base_url}}"],
-              "path": ["customer", "orders", "{{order_id}}"]
-            }
-          }
-        },
-        {
-          "name": "Create Order",
+          "name": "V3 Register (Send OTP)",
           "request": {
             "method": "POST",
             "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              },
-              {
-                "key": "Authorization",
-                "value": "Bearer {{customer_token}}"
-              }
+              { "key": "Accept", "value": "application/json" },
+              { "key": "Content-Type", "value": "application/json" }
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\"restaurant_id\": 1, \"items\": [{\"product_id\": 1, \"quantity\": 2, \"special_instructions\": \"No onion\"}], \"delivery_address_id\": 1, \"payment_method\": \"card\", \"notes\": \"Please ring the bell\"}"
+              "raw": "{\n  \"phone\": \"{{customer_phone}}\"\n}"
             },
             "url": {
-              "raw": "{{base_url}}/customer/orders",
-              "host": ["{{base_url}}"],
-              "path": ["customer", "orders"]
+              "raw": "{{base_url_v3}}/register",
+              "host": ["{{base_url_v3}}"],
+              "path": ["register"]
             }
-          }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "  var data = pm.response.json();",
+                  "  if (data.otp) pm.environment.set('customer_otp', String(data.otp));",
+                  "}"
+                ]
+              }
+            }
+          ]
         },
         {
-          "name": "Cancel Order",
-          "request": {
-            "method": "PUT",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              },
-              {
-                "key": "Authorization",
-                "value": "Bearer {{customer_token}}"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\"status\": \"cancelled\"}"
-            },
-            "url": {
-              "raw": "{{base_url}}/customer/orders/{{order_id}}",
-              "host": ["{{base_url}}"],
-              "path": ["customer", "orders", "{{order_id}}"]
-            }
-          }
-        }
-      ]
-    },
-    {
-      "name": "Addresses",
-      "item": [
-        {
-          "name": "Get All Addresses",
-          "request": {
-            "method": "GET",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{customer_token}}"
-              }
-            ],
-            "url": {
-              "raw": "{{base_url}}/customer/addresses",
-              "host": ["{{base_url}}"],
-              "path": ["customer", "addresses"]
-            }
-          }
-        },
-        {
-          "name": "Add Address",
+          "name": "V3 Login (Send OTP)",
           "request": {
             "method": "POST",
             "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              },
-              {
-                "key": "Authorization",
-                "value": "Bearer {{customer_token}}"
-              }
+              { "key": "Accept", "value": "application/json" },
+              { "key": "Content-Type", "value": "application/json" }
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\"label\": \"Home\", \"address\": \"123 Main Street, Dushanbe\", \"latitude\": 38.5598, \"longitude\": 68.7738, \"default\": true}"
+              "raw": "{\n  \"phone\": \"{{customer_phone}}\"\n}"
             },
             "url": {
-              "raw": "{{base_url}}/customer/addresses",
-              "host": ["{{base_url}}"],
-              "path": ["customer", "addresses"]
+              "raw": "{{base_url_v3}}/login",
+              "host": ["{{base_url_v3}}"],
+              "path": ["login"]
             }
-          }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "  var data = pm.response.json();",
+                  "  if (data.otp) pm.environment.set('customer_otp', String(data.otp));",
+                  "}"
+                ]
+              }
+            }
+          ]
         },
         {
-          "name": "Update Address",
-          "request": {
-            "method": "PUT",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              },
-              {
-                "key": "Authorization",
-                "value": "Bearer {{customer_token}}"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\"label\": \"Home\", \"address\": \"456 New Street, Dushanbe\", \"latitude\": 38.5598, \"longitude\": 68.7738}"
-            },
-            "url": {
-              "raw": "{{base_url}}/customer/addresses/1",
-              "host": ["{{base_url}}"],
-              "path": ["customer", "addresses", "1"]
-            }
-          }
-        },
-        {
-          "name": "Delete Address",
-          "request": {
-            "method": "DELETE",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{customer_token}}"
-              }
-            ],
-            "url": {
-              "raw": "{{base_url}}/customer/addresses/1",
-              "host": ["{{base_url}}"],
-              "path": ["customer", "addresses", "1"]
-            }
-          }
-        }
-      ]
-    },
-    {
-      "name": "Wallet",
-      "item": [
-        {
-          "name": "Get Wallet",
-          "request": {
-            "method": "GET",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{customer_token}}"
-              }
-            ],
-            "url": {
-              "raw": "{{base_url}}/customer/wallet",
-              "host": ["{{base_url}}"],
-              "path": ["customer", "wallet"]
-            }
-          }
-        },
-        {
-          "name": "Add Balance to Wallet",
+          "name": "V3 Verify Phone (Complete Login)",
           "request": {
             "method": "POST",
             "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              },
-              {
-                "key": "Authorization",
-                "value": "Bearer {{customer_token}}"
-              }
+              { "key": "Accept", "value": "application/json" },
+              { "key": "Content-Type", "value": "application/json" }
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\"amount\": 50.00, \"payment_method\": \"card\"}"
+              "raw": "{\n  \"phone\": \"{{customer_phone}}\",\n  \"otp\": \"{{customer_otp}}\"\n}"
             },
             "url": {
-              "raw": "{{base_url}}/customer/wallet/add-balance",
-              "host": ["{{base_url}}"],
-              "path": ["customer", "wallet", "add-balance"]
+              "raw": "{{base_url_v3}}/verify-phone",
+              "host": ["{{base_url_v3}}"],
+              "path": ["verify-phone"]
             }
-          }
-        }
-      ]
-    },
-    {
-      "name": "Wishlist",
-      "item": [
-        {
-          "name": "Get Wishlist",
-          "request": {
-            "method": "GET",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{customer_token}}"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "  var data = pm.response.json();",
+                  "  if (data.token) pm.environment.set('customer_token', data.token);",
+                  "}"
+                ]
               }
-            ],
-            "url": {
-              "raw": "{{base_url}}/customer/wishlist",
-              "host": ["{{base_url}}"],
-              "path": ["customer", "wishlist"]
             }
-          }
+          ]
         },
         {
-          "name": "Add to Wishlist",
+          "name": "Legacy Send OTP",
           "request": {
             "method": "POST",
             "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              },
-              {
-                "key": "Authorization",
-                "value": "Bearer {{customer_token}}"
-              }
+              { "key": "Accept", "value": "application/json" },
+              { "key": "Content-Type", "value": "application/json" }
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\"product_id\": 1}"
+              "raw": "{\n  \"phone\": \"{{customer_phone}}\"\n}"
             },
             "url": {
-              "raw": "{{base_url}}/customer/wishlist",
+              "raw": "{{base_url}}/auth/customer/send-otp",
               "host": ["{{base_url}}"],
-              "path": ["customer", "wishlist"]
+              "path": ["auth", "customer", "send-otp"]
             }
-          }
-        },
-        {
-          "name": "Remove from Wishlist",
-          "request": {
-            "method": "DELETE",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{customer_token}}"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "  var data = pm.response.json();",
+                  "  if (data.otp) pm.environment.set('customer_otp', String(data.otp));",
+                  "}"
+                ]
               }
-            ],
-            "url": {
-              "raw": "{{base_url}}/customer/wishlist/1",
-              "host": ["{{base_url}}"],
-              "path": ["customer", "wishlist", "1"]
             }
-          }
-        }
-      ]
-    },
-    {
-      "name": "Public Endpoints (No Auth)",
-      "item": [
-        {
-          "name": "Get Restaurants",
-          "request": {
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "{{base_url}}/restaurants?page=1&per_page=15&sort=rating",
-              "host": ["{{base_url}}"],
-              "path": ["restaurants"],
-              "query": [
-                {
-                  "key": "page",
-                  "value": "1"
-                },
-                {
-                  "key": "per_page",
-                  "value": "15"
-                },
-                {
-                  "key": "sort",
-                  "value": "rating"
-                }
-              ]
-            }
-          }
+          ]
         },
         {
-          "name": "Get Restaurant Products",
-          "request": {
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "{{base_url}}/restaurants/{{restaurant_id}}/products",
-              "host": ["{{base_url}}"],
-              "path": ["restaurants", "{{restaurant_id}}", "products"]
-            }
-          }
-        },
-        {
-          "name": "Search Products",
-          "request": {
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "{{base_url}}/products/search?q=pizza",
-              "host": ["{{base_url}}"],
-              "path": ["products", "search"],
-              "query": [
-                {
-                  "key": "q",
-                  "value": "pizza"
-                }
-              ]
-            }
-          }
-        },
-        {
-          "name": "Get Categories",
-          "request": {
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "{{base_url}}/categories",
-              "host": ["{{base_url}}"],
-              "path": ["categories"]
-            }
-          }
-        },
-        {
-          "name": "Get All Coupons",
-          "request": {
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "{{base_url}}/coupons",
-              "host": ["{{base_url}}"],
-              "path": ["coupons"]
-            }
-          }
-        },
-        {
-          "name": "Validate Coupon",
+          "name": "Legacy Verify OTP",
           "request": {
             "method": "POST",
             "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
+              { "key": "Accept", "value": "application/json" },
+              { "key": "Content-Type", "value": "application/json" }
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\"order_amount\": 100.00}"
+              "raw": "{\n  \"phone\": \"{{customer_phone}}\",\n  \"otp\": \"{{customer_otp}}\"\n}"
             },
             "url": {
-              "raw": "{{base_url}}/coupons/SUMMER20/validate",
+              "raw": "{{base_url}}/auth/customer/verify-otp",
               "host": ["{{base_url}}"],
-              "path": ["coupons", "SUMMER20", "validate"]
+              "path": ["auth", "customer", "verify-otp"]
             }
-          }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "  var data = pm.response.json();",
+                  "  if (data.token) pm.environment.set('customer_token', data.token);",
+                  "}"
+                ]
+              }
+            }
+          ]
         }
       ]
-    }
-  ],
-  "event": [
-    {
-      "listen": "prerequest",
-      "script": {
-        "type": "text/javascript",
-        "exec": [
-          ""
-        ]
-      }
-    },
-    {
-      "listen": "test",
-      "script": {
-        "type": "text/javascript",
-        "exec": [
-          ""
-        ]
-      }
     }
   ],
   "variable": [
-    {
-      "key": "base_url",
-      "value": "http://localhost:8000/api/v1",
-      "type": "string"
-    },
-    {
-      "key": "customer_token",
-      "value": "",
-      "type": "string"
-    },
-    {
-      "key": "order_id",
-      "value": "1",
-      "type": "string"
-    },
-    {
-      "key": "restaurant_id",
-      "value": "1",
-      "type": "string"
-    }
+    { "key": "base_url", "value": "http://localhost:8000/api/v1" },
+    { "key": "base_url_v3", "value": "http://localhost:8000/api/v3" },
+    { "key": "customer_phone", "value": "+992901234567" },
+    { "key": "customer_otp", "value": "123456" },
+    { "key": "customer_token", "value": "" }
   ]
 }

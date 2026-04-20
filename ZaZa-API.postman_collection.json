@@ -1,1465 +1,540 @@
 {
   "info": {
-    "_postman_id": "zaza-api-collection-2026",
-    "name": "ZaZa Service - Complete API Collection",
-    "description": "150+ API endpoints for ZaZa Food Delivery Ecosystem\n\nThis collection includes:\n- Customer APIs (35+ endpoints)\n- Driver/Delivery Man APIs (30+ endpoints)\n- Vendor/Restaurant APIs (40+ endpoints)\n- Public Catalog APIs (20+ endpoints)\n- Configuration & Utilities (8+ endpoints)\n- Authentication flows for all user types\n\nBase URLs:\n- Development: http://localhost:8000/api/v1\n- Production: https://api.zaza.tj/api/v1\n\nAuthentication:\n- Customers & Vendors: Bearer Token (OAuth)\n- Drivers: Query Parameter Token\n- Public: No authentication required",
+    "_postman_id": "zaza-unified-api-v2",
+    "name": "ZaZa Service API",
+    "description": "Unified Postman collection aligned with current endpoints used by all apps.",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "item": [
     {
-      "name": "🔐 Authentication",
-      "description": "User authentication endpoints for customers, drivers, and vendors",
+      "name": "Customer App",
       "item": [
         {
-          "name": "Customer - Send OTP",
+          "name": "V1 Sign-Up (Send OTP)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Accept", "value": "application/json" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n  \"phone\": \"{{customer_phone}}\"\n}" },
+            "url": {
+              "raw": "{{base_url}}/auth/sign-up",
+              "host": ["{{base_url}}"],
+              "path": ["auth", "sign-up"]
+            }
+          },
           "event": [
             {
               "listen": "test",
               "script": {
                 "exec": [
                   "if (pm.response.code === 200) {",
-                  "  var response = pm.response.json();",
-                  "  pm.environment.set('otp_reference', response.data.reference);",
+                  "  var data = pm.response.json();",
+                  "  if (data.otp) pm.environment.set('customer_otp', String(data.otp));",
                   "}"
                 ]
               }
             }
-          ],
+          ]
+        },
+        {
+          "name": "V1 Login (Send OTP)",
           "request": {
             "method": "POST",
             "header": [
-              {
-                "key": "Accept",
-                "value": "application/json"
-              },
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
+              { "key": "Accept", "value": "application/json" },
+              { "key": "Content-Type", "value": "application/json" }
             ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"phone\": \"+992901234567\"\n}"
-            },
+            "body": { "mode": "raw", "raw": "{\n  \"phone\": \"{{customer_phone}}\"\n}" },
+            "url": {
+              "raw": "{{base_url}}/auth/login",
+              "host": ["{{base_url}}"],
+              "path": ["auth", "login"]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "  var data = pm.response.json();",
+                  "  if (data.otp) pm.environment.set('customer_otp', String(data.otp));",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "V1 Verify Phone (Complete Login)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Accept", "value": "application/json" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n  \"phone\": \"{{customer_phone}}\",\n  \"otp\": \"{{customer_otp}}\"\n}" },
+            "url": {
+              "raw": "{{base_url}}/auth/verify-phone",
+              "host": ["{{base_url}}"],
+              "path": ["auth", "verify-phone"]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "  var data = pm.response.json();",
+                  "  if (data.token) pm.environment.set('customer_token', data.token);",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "V3 Register (Send OTP)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Accept", "value": "application/json" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n  \"phone\": \"{{customer_phone}}\"\n}" },
+            "url": {
+              "raw": "{{base_url_v3}}/register",
+              "host": ["{{base_url_v3}}"],
+              "path": ["register"]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "  var data = pm.response.json();",
+                  "  if (data.otp) pm.environment.set('customer_otp', String(data.otp));",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "V3 Login (Send OTP)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Accept", "value": "application/json" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n  \"phone\": \"{{customer_phone}}\"\n}" },
+            "url": {
+              "raw": "{{base_url_v3}}/login",
+              "host": ["{{base_url_v3}}"],
+              "path": ["login"]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "  var data = pm.response.json();",
+                  "  if (data.otp) pm.environment.set('customer_otp', String(data.otp));",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "V3 Verify Phone (Complete Login)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Accept", "value": "application/json" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n  \"phone\": \"{{customer_phone}}\",\n  \"otp\": \"{{customer_otp}}\"\n}" },
+            "url": {
+              "raw": "{{base_url_v3}}/verify-phone",
+              "host": ["{{base_url_v3}}"],
+              "path": ["verify-phone"]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "  var data = pm.response.json();",
+                  "  if (data.token) pm.environment.set('customer_token', data.token);",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Legacy Send OTP",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Accept", "value": "application/json" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n  \"phone\": \"{{customer_phone}}\"\n}" },
             "url": {
               "raw": "{{base_url}}/auth/customer/send-otp",
               "host": ["{{base_url}}"],
               "path": ["auth", "customer", "send-otp"]
             }
           },
-          "response": []
-        },
-        {
-          "name": "Customer - Verify OTP & Login",
           "event": [
             {
               "listen": "test",
               "script": {
                 "exec": [
                   "if (pm.response.code === 200) {",
-                  "  var response = pm.response.json();",
-                  "  pm.environment.set('customer_token', response.data.token);",
-                  "  pm.environment.set('customer_id', response.data.user.id);",
-                  "  pm.auth.setAuthHeader('Bearer ' + response.data.token);",
+                  "  var data = pm.response.json();",
+                  "  if (data.otp) pm.environment.set('customer_otp', String(data.otp));",
                   "}"
                 ]
               }
             }
-          ],
+          ]
+        },
+        {
+          "name": "Legacy Verify OTP",
           "request": {
             "method": "POST",
             "header": [
-              {
-                "key": "Accept",
-                "value": "application/json"
-              },
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
+              { "key": "Accept", "value": "application/json" },
+              { "key": "Content-Type", "value": "application/json" }
             ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"phone\": \"+992901234567\",\n  \"otp\": \"123456\",\n  \"reference\": \"{{otp_reference}}\"\n}"
-            },
+            "body": { "mode": "raw", "raw": "{\n  \"phone\": \"{{customer_phone}}\",\n  \"otp\": \"{{customer_otp}}\"\n}" },
             "url": {
               "raw": "{{base_url}}/auth/customer/verify-otp",
               "host": ["{{base_url}}"],
               "path": ["auth", "customer", "verify-otp"]
             }
           },
-          "response": []
-        },
-        {
-          "name": "Customer - Register New Account",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Accept",
-                "value": "application/json"
-              },
-              {
-                "key": "Content-Type",
-                "value": "application/json"
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "  var data = pm.response.json();",
+                  "  if (data.token) pm.environment.set('customer_token', data.token);",
+                  "}"
+                ]
               }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"phone\": \"+992901234567\",\n  \"f_name\": \"John\",\n  \"l_name\": \"Doe\",\n  \"email\": \"john@example.com\",\n  \"password\": \"SecurePassword123!\",\n  \"otp\": \"123456\"\n}"
-            },
-            "url": {
-              "raw": "{{base_url}}/auth/customer/register",
-              "host": ["{{base_url}}"],
-              "path": ["auth", "customer", "register"]
             }
-          },
-          "response": []
-        },
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Driver App",
+      "item": [
         {
-          "name": "Driver - Send OTP",
+          "name": "Send OTP",
           "request": {
             "method": "POST",
             "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
+              { "key": "Accept", "value": "application/json" },
+              { "key": "Content-Type", "value": "application/json" }
             ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"phone\": \"+992901234567\"\n}"
-            },
+            "body": { "mode": "raw", "raw": "{\n  \"phone\": \"{{driver_phone}}\"\n}" },
             "url": {
               "raw": "{{base_url}}/auth/delivery-man/send-otp",
               "host": ["{{base_url}}"],
               "path": ["auth", "delivery-man", "send-otp"]
             }
           },
-          "response": []
-        },
-        {
-          "name": "Driver - Verify OTP & Login",
           "event": [
             {
               "listen": "test",
               "script": {
                 "exec": [
                   "if (pm.response.code === 200) {",
-                  "  var response = pm.response.json();",
-                  "  pm.environment.set('driver_token', response.data.token);",
-                  "  pm.environment.set('driver_id', response.data.user.id);",
+                  "  var data = pm.response.json();",
+                  "  if (data.otp) pm.environment.set('driver_otp', data.otp);",
                   "}"
                 ]
               }
             }
-          ],
+          ]
+        },
+        {
+          "name": "Verify OTP",
           "request": {
             "method": "POST",
             "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
+              { "key": "Accept", "value": "application/json" },
+              { "key": "Content-Type", "value": "application/json" }
             ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"phone\": \"+992901234567\",\n  \"otp\": \"123456\"\n}"
-            },
+            "body": { "mode": "raw", "raw": "{\n  \"phone\": \"{{driver_phone}}\",\n  \"otp\": \"{{driver_otp}}\"\n}" },
             "url": {
               "raw": "{{base_url}}/auth/delivery-man/verify-otp",
               "host": ["{{base_url}}"],
               "path": ["auth", "delivery-man", "verify-otp"]
             }
           },
-          "response": []
-        },
-        {
-          "name": "Vendor - Login",
           "event": [
             {
               "listen": "test",
               "script": {
                 "exec": [
                   "if (pm.response.code === 200) {",
-                  "  var response = pm.response.json();",
-                  "  pm.environment.set('vendor_token', response.data.token);",
-                  "  pm.environment.set('vendor_id', response.data.user.vendor_id);",
+                  "  var data = pm.response.json();",
+                  "  if (data.token) pm.environment.set('driver_token', data.token);",
                   "}"
                 ]
               }
             }
-          ],
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"email\": \"vendor@restaurant.com\",\n  \"password\": \"VendorPassword123!\"\n}"
-            },
-            "url": {
-              "raw": "{{base_url}}/auth/vendor/login",
-              "host": ["{{base_url}}"],
-              "path": ["auth", "vendor", "login"]
-            }
-          },
-          "response": []
-        }
-      ]
-    },
-    {
-      "name": "👤 Customer APIs",
-      "description": "Authenticated customer endpoints for profile, orders, addresses, wallet, wishlist",
-      "item": [
+          ]
+        },
         {
           "name": "Get Profile",
           "request": {
-            "auth": {
-              "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{customer_token}}",
-                  "type": "string"
-                }
-              ]
-            },
             "method": "GET",
             "header": [
-              {
-                "key": "Accept",
-                "value": "application/json"
-              }
-            ],
-            "url": {
-              "raw": "{{base_url}}/customer/profile",
-              "host": ["{{base_url}}"],
-              "path": ["customer", "profile"]
-            }
-          },
-          "response": []
-        },
-        {
-          "name": "Update Profile",
-          "request": {
-            "auth": {
-              "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{customer_token}}",
-                  "type": "string"
-                }
-              ]
-            },
-            "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"f_name\": \"John\",\n  \"l_name\": \"Doe\",\n  \"email\": \"john@example.com\",\n  \"phone\": \"+992901234567\"\n}"
-            },
-            "url": {
-              "raw": "{{base_url}}/customer/profile/update",
-              "host": ["{{base_url}}"],
-              "path": ["customer", "profile", "update"]
-            }
-          },
-          "response": []
-        },
-        {
-          "name": "Get Orders",
-          "request": {
-            "auth": {
-              "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{customer_token}}",
-                  "type": "string"
-                }
-              ]
-            },
-            "method": "GET",
-            "header": [
-              {
-                "key": "Accept",
-                "value": "application/json"
-              }
-            ],
-            "url": {
-              "raw": "{{base_url}}/customer/orders?page=1&limit=10",
-              "host": ["{{base_url}}"],
-              "path": ["customer", "orders"],
-              "query": [
-                {
-                  "key": "page",
-                  "value": "1"
-                },
-                {
-                  "key": "limit",
-                  "value": "10"
-                },
-                {
-                  "key": "status",
-                  "value": "pending",
-                  "disabled": true
-                }
-              ]
-            }
-          },
-          "response": []
-        },
-        {
-          "name": "Get Order Details",
-          "request": {
-            "auth": {
-              "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{customer_token}}",
-                  "type": "string"
-                }
-              ]
-            },
-            "method": "GET",
-            "header": [
-              {
-                "key": "Accept",
-                "value": "application/json"
-              }
-            ],
-            "url": {
-              "raw": "{{base_url}}/customer/order/{{order_id}}",
-              "host": ["{{base_url}}"],
-              "path": ["customer", "order", "{{order_id}}"]
-            }
-          },
-          "response": []
-        },
-        {
-          "name": "Place New Order",
-          "request": {
-            "auth": {
-              "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{customer_token}}",
-                  "type": "string"
-                }
-              ]
-            },
-            "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"restaurant_id\": 1,\n  \"delivery_address_id\": 1,\n  \"items\": [\n    {\n      \"product_id\": 5,\n      \"quantity\": 2,\n      \"special_instructions\": \"No onions\"\n    },\n    {\n      \"product_id\": 8,\n      \"quantity\": 1\n    }\n  ],\n  \"payment_method\": \"wallet\",\n  \"coupon_code\": \"SAVE10\",\n  \"delivery_type\": \"instant\"\n}"
-            },
-            "url": {
-              "raw": "{{base_url}}/customer/order/place",
-              "host": ["{{base_url}}"],
-              "path": ["customer", "order", "place"]
-            }
-          },
-          "response": []
-        },
-        {
-          "name": "Get Addresses",
-          "request": {
-            "auth": {
-              "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{customer_token}}",
-                  "type": "string"
-                }
-              ]
-            },
-            "method": "GET",
-            "header": [
-              {
-                "key": "Accept",
-                "value": "application/json"
-              }
-            ],
-            "url": {
-              "raw": "{{base_url}}/customer/addresses",
-              "host": ["{{base_url}}"],
-              "path": ["customer", "addresses"]
-            }
-          },
-          "response": []
-        },
-        {
-          "name": "Add Address",
-          "request": {
-            "auth": {
-              "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{customer_token}}",
-                  "type": "string"
-                }
-              ]
-            },
-            "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"label\": \"Home\",\n  \"address\": \"123 Main Street, Apt 4B\",\n  \"latitude\": 37.7749,\n  \"longitude\": -122.4194,\n  \"is_default\": true\n}"
-            },
-            "url": {
-              "raw": "{{base_url}}/customer/address/add",
-              "host": ["{{base_url}}"],
-              "path": ["customer", "address", "add"]
-            }
-          },
-          "response": []
-        },
-        {
-          "name": "Get Wallet Balance",
-          "request": {
-            "auth": {
-              "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{customer_token}}",
-                  "type": "string"
-                }
-              ]
-            },
-            "method": "GET",
-            "header": [
-              {
-                "key": "Accept",
-                "value": "application/json"
-              }
-            ],
-            "url": {
-              "raw": "{{base_url}}/customer/wallet",
-              "host": ["{{base_url}}"],
-              "path": ["customer", "wallet"]
-            }
-          },
-          "response": []
-        },
-        {
-          "name": "Add Wallet Balance",
-          "request": {
-            "auth": {
-              "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{customer_token}}",
-                  "type": "string"
-                }
-              ]
-            },
-            "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"amount\": 50.00,\n  \"payment_method\": \"card\"\n}"
-            },
-            "url": {
-              "raw": "{{base_url}}/customer/wallet/add",
-              "host": ["{{base_url}}"],
-              "path": ["customer", "wallet", "add"]
-            }
-          },
-          "response": []
-        },
-        {
-          "name": "Get Wishlist",
-          "request": {
-            "auth": {
-              "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{customer_token}}",
-                  "type": "string"
-                }
-              ]
-            },
-            "method": "GET",
-            "header": [
-              {
-                "key": "Accept",
-                "value": "application/json"
-              }
-            ],
-            "url": {
-              "raw": "{{base_url}}/customer/wishlist",
-              "host": ["{{base_url}}"],
-              "path": ["customer", "wishlist"]
-            }
-          },
-          "response": []
-        },
-        {
-          "name": "Add to Wishlist",
-          "request": {
-            "auth": {
-              "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{customer_token}}",
-                  "type": "string"
-                }
-              ]
-            },
-            "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"product_id\": 5\n}"
-            },
-            "url": {
-              "raw": "{{base_url}}/customer/wishlist/add",
-              "host": ["{{base_url}}"],
-              "path": ["customer", "wishlist", "add"]
-            }
-          },
-          "response": []
-        }
-      ]
-    },
-    {
-      "name": "🛵 Driver/Delivery Man APIs",
-      "description": "Driver authentication and order delivery management endpoints",
-      "item": [
-        {
-          "name": "Get Driver Profile",
-          "request": {
-            "method": "GET",
-            "header": [
-              {
-                "key": "Accept",
-                "value": "application/json"
-              }
+              { "key": "Accept", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{driver_token}}" }
             ],
             "url": {
               "raw": "{{base_url}}/delivery-man/profile?token={{driver_token}}",
               "host": ["{{base_url}}"],
               "path": ["delivery-man", "profile"],
-              "query": [
-                {
-                  "key": "token",
-                  "value": "{{driver_token}}"
-                }
-              ]
+              "query": [{ "key": "token", "value": "{{driver_token}}" }]
             }
-          },
-          "response": []
+          }
         },
         {
-          "name": "Update Driver Location",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"latitude\": 37.7749,\n  \"longitude\": -122.4194,\n  \"token\": \"{{driver_token}}\"\n}"
-            },
-            "url": {
-              "raw": "{{base_url}}/delivery-man/update-location",
-              "host": ["{{base_url}}"],
-              "path": ["delivery-man", "update-location"]
-            }
-          },
-          "response": []
-        },
-        {
-          "name": "Get Available Orders",
+          "name": "Latest Orders",
           "request": {
             "method": "GET",
             "header": [
-              {
-                "key": "Accept",
-                "value": "application/json"
-              }
+              { "key": "Accept", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{driver_token}}" }
             ],
             "url": {
-              "raw": "{{base_url}}/delivery-man/available-orders?token={{driver_token}}&page=1",
+              "raw": "{{base_url}}/delivery-man/latest-orders?token={{driver_token}}",
               "host": ["{{base_url}}"],
-              "path": ["delivery-man", "available-orders"],
+              "path": ["delivery-man", "latest-orders"],
+              "query": [{ "key": "token", "value": "{{driver_token}}" }]
+            }
+          }
+        },
+        {
+          "name": "Current Orders",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Accept", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{driver_token}}" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/delivery-man/current-orders?token={{driver_token}}",
+              "host": ["{{base_url}}"],
+              "path": ["delivery-man", "current-orders"],
+              "query": [{ "key": "token", "value": "{{driver_token}}" }]
+            }
+          }
+        },
+        {
+          "name": "All Orders",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Accept", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{driver_token}}" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/delivery-man/all-orders?token={{driver_token}}",
+              "host": ["{{base_url}}"],
+              "path": ["delivery-man", "all-orders"],
+              "query": [{ "key": "token", "value": "{{driver_token}}" }]
+            }
+          }
+        },
+        {
+          "name": "Order Delivery History",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Accept", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{driver_token}}" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/delivery-man/order-delivery-history?token={{driver_token}}&limit=20&offset=1",
+              "host": ["{{base_url}}"],
+              "path": ["delivery-man", "order-delivery-history"],
               "query": [
-                {
-                  "key": "token",
-                  "value": "{{driver_token}}"
-                },
-                {
-                  "key": "page",
-                  "value": "1"
-                }
+                { "key": "token", "value": "{{driver_token}}" },
+                { "key": "limit", "value": "20" },
+                { "key": "offset", "value": "1" }
               ]
             }
-          },
-          "response": []
+          }
         },
         {
           "name": "Accept Order",
           "request": {
-            "method": "POST",
+            "method": "PUT",
             "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
+              { "key": "Accept", "value": "application/json" },
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{driver_token}}" }
             ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"order_id\": 123,\n  \"token\": \"{{driver_token}}\"\n}"
-            },
+            "body": { "mode": "raw", "raw": "{\n  \"order_id\": {{order_id}}\n}" },
             "url": {
-              "raw": "{{base_url}}/delivery-man/order/accept",
+              "raw": "{{base_url}}/delivery-man/accept-order?token={{driver_token}}",
               "host": ["{{base_url}}"],
-              "path": ["delivery-man", "order", "accept"]
+              "path": ["delivery-man", "accept-order"],
+              "query": [{ "key": "token", "value": "{{driver_token}}" }]
             }
-          },
-          "response": []
-        },
-        {
-          "name": "Get Active Deliveries",
-          "request": {
-            "method": "GET",
-            "header": [
-              {
-                "key": "Accept",
-                "value": "application/json"
-              }
-            ],
-            "url": {
-              "raw": "{{base_url}}/delivery-man/active-orders?token={{driver_token}}",
-              "host": ["{{base_url}}"],
-              "path": ["delivery-man", "active-orders"],
-              "query": [
-                {
-                  "key": "token",
-                  "value": "{{driver_token}}"
-                }
-              ]
-            }
-          },
-          "response": []
+          }
         },
         {
           "name": "Update Order Status",
           "request": {
-            "method": "POST",
+            "method": "PUT",
             "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
+              { "key": "Accept", "value": "application/json" },
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{driver_token}}" }
             ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"order_id\": 123,\n  \"status\": \"on_the_way\",\n  \"token\": \"{{driver_token}}\"\n}"
-            },
+            "body": { "mode": "raw", "raw": "{\n  \"order_id\": {{order_id}},\n  \"status\": \"picked_up\"\n}" },
             "url": {
-              "raw": "{{base_url}}/delivery-man/order/update-status",
+              "raw": "{{base_url}}/delivery-man/update-order-status?token={{driver_token}}",
               "host": ["{{base_url}}"],
-              "path": ["delivery-man", "order", "update-status"]
+              "path": ["delivery-man", "update-order-status"],
+              "query": [{ "key": "token", "value": "{{driver_token}}" }]
             }
-          },
-          "response": []
+          }
         },
         {
-          "name": "Complete Order Delivery",
+          "name": "Toggle Active Status",
           "request": {
             "method": "POST",
             "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
+              { "key": "Accept", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{driver_token}}" }
             ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"order_id\": 123,\n  \"signature\": \"base64_encoded_signature\",\n  \"token\": \"{{driver_token}}\"\n}"
-            },
+            "body": { "mode": "raw", "raw": "{}" },
             "url": {
-              "raw": "{{base_url}}/delivery-man/order/complete",
+              "raw": "{{base_url}}/delivery-man/update-active-status?token={{driver_token}}",
               "host": ["{{base_url}}"],
-              "path": ["delivery-man", "order", "complete"]
+              "path": ["delivery-man", "update-active-status"],
+              "query": [{ "key": "token", "value": "{{driver_token}}" }]
             }
-          },
-          "response": []
+          }
         },
         {
-          "name": "Get Earnings",
-          "request": {
-            "method": "GET",
-            "header": [
-              {
-                "key": "Accept",
-                "value": "application/json"
-              }
-            ],
-            "url": {
-              "raw": "{{base_url}}/delivery-man/earnings?token={{driver_token}}&from=2026-01-01&to=2026-03-26",
-              "host": ["{{base_url}}"],
-              "path": ["delivery-man", "earnings"],
-              "query": [
-                {
-                  "key": "token",
-                  "value": "{{driver_token}}"
-                },
-                {
-                  "key": "from",
-                  "value": "2026-01-01"
-                },
-                {
-                  "key": "to",
-                  "value": "2026-03-26"
-                }
-              ]
-            }
-          },
-          "response": []
-        },
-        {
-          "name": "Request Withdrawal",
+          "name": "Record Location",
           "request": {
             "method": "POST",
             "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
+              { "key": "Accept", "value": "application/json" },
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{driver_token}}" }
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"amount\": 100.00,\n  \"bank_account_id\": 1,\n  \"token\": \"{{driver_token}}\"\n}"
+              "raw": "{\n  \"latitude\": 38.5598,\n  \"longitude\": 68.7870,\n  \"location\": \"Dushanbe\"\n}"
             },
             "url": {
-              "raw": "{{base_url}}/delivery-man/earnings/withdraw",
+              "raw": "{{base_url}}/delivery-man/record-location-data?token={{driver_token}}",
               "host": ["{{base_url}}"],
-              "path": ["delivery-man", "earnings", "withdraw"]
+              "path": ["delivery-man", "record-location-data"],
+              "query": [{ "key": "token", "value": "{{driver_token}}" }]
             }
-          },
-          "response": []
+          }
+        },
+        {
+          "name": "Request Withdraw",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Accept", "value": "application/json" },
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{driver_token}}" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n  \"amount\": 50\n}" },
+            "url": {
+              "raw": "{{base_url}}/delivery-man/request-withdraw?token={{driver_token}}",
+              "host": ["{{base_url}}"],
+              "path": ["delivery-man", "request-withdraw"],
+              "query": [{ "key": "token", "value": "{{driver_token}}" }]
+            }
+          }
         }
       ]
     },
     {
-      "name": "🏪 Vendor/Restaurant APIs",
-      "description": "Restaurant management, product catalog, order processing, and financial operations",
+      "name": "Restaurant Landing",
       "item": [
         {
-          "name": "Get Vendor Profile",
-          "request": {
-            "auth": {
-              "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{vendor_token}}",
-                  "type": "string"
-                }
-              ]
-            },
-            "method": "GET",
-            "header": [
-              {
-                "key": "Accept",
-                "value": "application/json"
-              }
-            ],
-            "url": {
-              "raw": "{{base_url}}/vendor/profile",
-              "host": ["{{base_url}}"],
-              "path": ["vendor", "profile"]
-            }
-          },
-          "response": []
-        },
-        {
-          "name": "Get Products",
-          "request": {
-            "auth": {
-              "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{vendor_token}}",
-                  "type": "string"
-                }
-              ]
-            },
-            "method": "GET",
-            "header": [
-              {
-                "key": "Accept",
-                "value": "application/json"
-              }
-            ],
-            "url": {
-              "raw": "{{base_url}}/vendor/products?page=1&limit=20",
-              "host": ["{{base_url}}"],
-              "path": ["vendor", "products"],
-              "query": [
-                {
-                  "key": "page",
-                  "value": "1"
-                },
-                {
-                  "key": "limit",
-                  "value": "20"
-                }
-              ]
-            }
-          },
-          "response": []
-        },
-        {
-          "name": "Add Product",
-          "request": {
-            "auth": {
-              "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{vendor_token}}",
-                  "type": "string"
-                }
-              ]
-            },
-            "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"name\": \"Margherita Pizza\",\n  \"description\": \"Classic pizza with mozzarella and tomato\",\n  \"price\": 12.99,\n  \"category_id\": 5,\n  \"image_url\": \"https://example.com/pizza.jpg\",\n  \"preparation_time\": 15,\n  \"is_available\": true,\n  \"attributes\": {\n    \"size\": [\"small\", \"medium\", \"large\"],\n    \"dough\": [\"thin\", \"thick\"]\n  }\n}"
-            },
-            "url": {
-              "raw": "{{base_url}}/vendor/product/add",
-              "host": ["{{base_url}}"],
-              "path": ["vendor", "product", "add"]
-            }
-          },
-          "response": []
-        },
-        {
-          "name": "Get Orders",
-          "request": {
-            "auth": {
-              "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{vendor_token}}",
-                  "type": "string"
-                }
-              ]
-            },
-            "method": "GET",
-            "header": [
-              {
-                "key": "Accept",
-                "value": "application/json"
-              }
-            ],
-            "url": {
-              "raw": "{{base_url}}/vendor/orders?status=pending&page=1",
-              "host": ["{{base_url}}"],
-              "path": ["vendor", "orders"],
-              "query": [
-                {
-                  "key": "status",
-                  "value": "pending"
-                },
-                {
-                  "key": "page",
-                  "value": "1"
-                }
-              ]
-            }
-          },
-          "response": []
-        },
-        {
-          "name": "Confirm Order",
-          "request": {
-            "auth": {
-              "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{vendor_token}}",
-                  "type": "string"
-                }
-              ]
-            },
-            "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"order_id\": 123,\n  \"estimated_time\": 20\n}"
-            },
-            "url": {
-              "raw": "{{base_url}}/vendor/order/confirm",
-              "host": ["{{base_url}}"],
-              "path": ["vendor", "order", "confirm"]
-            }
-          },
-          "response": []
-        },
-        {
-          "name": "Get Earnings Report",
-          "request": {
-            "auth": {
-              "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{vendor_token}}",
-                  "type": "string"
-                }
-              ]
-            },
-            "method": "GET",
-            "header": [
-              {
-                "key": "Accept",
-                "value": "application/json"
-              }
-            ],
-            "url": {
-              "raw": "{{base_url}}/vendor/earnings?from=2026-01-01&to=2026-03-26",
-              "host": ["{{base_url}}"],
-              "path": ["vendor", "earnings"],
-              "query": [
-                {
-                  "key": "from",
-                  "value": "2026-01-01"
-                },
-                {
-                  "key": "to",
-                  "value": "2026-03-26"
-                }
-              ]
-            }
-          },
-          "response": []
-        },
-        {
-          "name": "Request Payout",
-          "request": {
-            "auth": {
-              "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{vendor_token}}",
-                  "type": "string"
-                }
-              ]
-            },
-            "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"amount\": 500.00,\n  \"payment_method\": \"bank_transfer\"\n}"
-            },
-            "url": {
-              "raw": "{{base_url}}/vendor/earnings/payout",
-              "host": ["{{base_url}}"],
-              "path": ["vendor", "earnings", "payout"]
-            }
-          },
-          "response": []
-        },
-        {
-          "name": "Manage Delivery Men",
-          "request": {
-            "auth": {
-              "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{vendor_token}}",
-                  "type": "string"
-                }
-              ]
-            },
-            "method": "GET",
-            "header": [
-              {
-                "key": "Accept",
-                "value": "application/json"
-              }
-            ],
-            "url": {
-              "raw": "{{base_url}}/vendor/delivery-men",
-              "host": ["{{base_url}}"],
-              "path": ["vendor", "delivery-men"]
-            }
-          },
-          "response": []
-        }
-      ]
-    },
-    {
-      "name": "📦 Public Catalog APIs",
-      "description": "Public endpoints for browsing restaurants, products, and promotions - no authentication required",
-      "item": [
-        {
-          "name": "Search Restaurants",
-          "request": {
-            "method": "GET",
-            "header": [
-              {
-                "key": "Accept",
-                "value": "application/json"
-              }
-            ],
-            "url": {
-              "raw": "{{base_url}}/restaurants?search=pizza&page=1&limit=10",
-              "host": ["{{base_url}}"],
-              "path": ["restaurants"],
-              "query": [
-                {
-                  "key": "search",
-                  "value": "pizza"
-                },
-                {
-                  "key": "page",
-                  "value": "1"
-                },
-                {
-                  "key": "limit",
-                  "value": "10"
-                },
-                {
-                  "key": "category",
-                  "value": "italian",
-                  "disabled": true
-                },
-                {
-                  "key": "rating_min",
-                  "value": "4",
-                  "disabled": true
-                }
-              ]
-            }
-          },
-          "response": []
-        },
-        {
-          "name": "Get Restaurant Details",
-          "request": {
-            "method": "GET",
-            "header": [
-              {
-                "key": "Accept",
-                "value": "application/json"
-              }
-            ],
-            "url": {
-              "raw": "{{base_url}}/restaurant/{{restaurant_id}}",
-              "host": ["{{base_url}}"],
-              "path": ["restaurant", "{{restaurant_id}}"]
-            }
-          },
-          "response": []
-        },
-        {
-          "name": "Get Products",
-          "request": {
-            "method": "GET",
-            "header": [
-              {
-                "key": "Accept",
-                "value": "application/json"
-              }
-            ],
-            "url": {
-              "raw": "{{base_url}}/products?restaurant_id={{restaurant_id}}&page=1",
-              "host": ["{{base_url}}"],
-              "path": ["products"],
-              "query": [
-                {
-                  "key": "restaurant_id",
-                  "value": "{{restaurant_id}}"
-                },
-                {
-                  "key": "page",
-                  "value": "1"
-                },
-                {
-                  "key": "category",
-                  "value": "appetizers",
-                  "disabled": true
-                }
-              ]
-            }
-          },
-          "response": []
-        },
-        {
-          "name": "Get Product Details",
-          "request": {
-            "method": "GET",
-            "header": [
-              {
-                "key": "Accept",
-                "value": "application/json"
-              }
-            ],
-            "url": {
-              "raw": "{{base_url}}/product/{{product_id}}",
-              "host": ["{{base_url}}"],
-              "path": ["product", "{{product_id}}"]
-            }
-          },
-          "response": []
-        },
-        {
-          "name": "Get Categories",
-          "request": {
-            "method": "GET",
-            "header": [
-              {
-                "key": "Accept",
-                "value": "application/json"
-              }
-            ],
-            "url": {
-              "raw": "{{base_url}}/categories",
-              "host": ["{{base_url}}"],
-              "path": ["categories"]
-            }
-          },
-          "response": []
-        },
-        {
-          "name": "Get Banners",
-          "request": {
-            "method": "GET",
-            "header": [
-              {
-                "key": "Accept",
-                "value": "application/json"
-              }
-            ],
-            "url": {
-              "raw": "{{base_url}}/banners",
-              "host": ["{{base_url}}"],
-              "path": ["banners"]
-            }
-          },
-          "response": []
-        },
-        {
-          "name": "Get Available Coupons",
-          "request": {
-            "method": "GET",
-            "header": [
-              {
-                "key": "Accept",
-                "value": "application/json"
-              }
-            ],
-            "url": {
-              "raw": "{{base_url}}/coupons?page=1",
-              "host": ["{{base_url}}"],
-              "path": ["coupons"],
-              "query": [
-                {
-                  "key": "page",
-                  "value": "1"
-                }
-              ]
-            }
-          },
-          "response": []
-        },
-        {
-          "name": "Validate Coupon",
+          "name": "Restaurant Partner Request",
           "request": {
             "method": "POST",
             "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
+              { "key": "Accept", "value": "application/json" },
+              { "key": "Content-Type", "value": "application/json" }
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"coupon_code\": \"SAVE10\",\n  \"order_total\": 50.00,\n  \"restaurant_id\": 1\n}"
+              "raw": "{\n  \"merchant_name\": \"My Restaurant\",\n  \"contact_name\": \"Owner Name\",\n  \"phone\": \"+992900000001\",\n  \"email\": \"owner@example.com\",\n  \"city\": \"Dushanbe\",\n  \"address\": \"Rudaki avenue\"\n}"
             },
             "url": {
-              "raw": "{{base_url}}/coupon/validate",
+              "raw": "{{base_url}}/partner-request/restaurant",
               "host": ["{{base_url}}"],
-              "path": ["coupon", "validate"]
+              "path": ["partner-request", "restaurant"]
             }
-          },
-          "response": []
-        }
-      ]
-    },
-    {
-      "name": "⚙️ Configuration APIs",
-      "description": "System configuration, zones, delivery settings, and map utilities",
-      "item": [
-        {
-          "name": "Get Delivery Zones",
-          "request": {
-            "method": "GET",
-            "header": [
-              {
-                "key": "Accept",
-                "value": "application/json"
-              }
-            ],
-            "url": {
-              "raw": "{{base_url}}/zones",
-              "host": ["{{base_url}}"],
-              "path": ["zones"]
-            }
-          },
-          "response": []
+          }
         },
         {
-          "name": "Calculate Delivery Charge",
+          "name": "B2B Delivery Request",
           "request": {
             "method": "POST",
             "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
+              { "key": "Accept", "value": "application/json" },
+              { "key": "Content-Type", "value": "application/json" }
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"from_latitude\": 37.7749,\n  \"from_longitude\": -122.4194,\n  \"to_latitude\": 37.7849,\n  \"to_longitude\": -122.4094\n}"
+              "raw": "{\n  \"company_name\": \"Acme LLC\",\n  \"contact_name\": \"Operations Manager\",\n  \"phone\": \"+992900000002\",\n  \"email\": \"ops@acme.tj\",\n  \"city\": \"Dushanbe\",\n  \"description\": \"~200 deliveries per month\"\n}"
             },
             "url": {
-              "raw": "{{base_url}}/delivery/calculate-charge",
+              "raw": "{{base_url}}/partner-request/b2b",
               "host": ["{{base_url}}"],
-              "path": ["delivery", "calculate-charge"]
+              "path": ["partner-request", "b2b"]
             }
-          },
-          "response": []
-        },
-        {
-          "name": "Reverse Geocoding",
-          "request": {
-            "method": "GET",
-            "header": [
-              {
-                "key": "Accept",
-                "value": "application/json"
-              }
-            ],
-            "url": {
-              "raw": "{{base_url}}/geocode/reverse?latitude=37.7749&longitude=-122.4194",
-              "host": ["{{base_url}}"],
-              "path": ["geocode", "reverse"],
-              "query": [
-                {
-                  "key": "latitude",
-                  "value": "37.7749"
-                },
-                {
-                  "key": "longitude",
-                  "value": "-122.4194"
-                }
-              ]
-            }
-          },
-          "response": []
-        },
-        {
-          "name": "Get System Configuration",
-          "request": {
-            "method": "GET",
-            "header": [
-              {
-                "key": "Accept",
-                "value": "application/json"
-              }
-            ],
-            "url": {
-              "raw": "{{base_url}}/config",
-              "host": ["{{base_url}}"],
-              "path": ["config"]
-            }
-          },
-          "response": []
-        }
-      ]
-    },
-    {
-      "name": "📝 Partner Request APIs",
-      "description": "Registration requests for restaurant and B2B partners",
-      "item": [
-        {
-          "name": "Submit Restaurant Application",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"restaurant_name\": \"Italian Kitchen\",\n  \"owner_name\": \"Marco Rossi\",\n  \"phone\": \"+992901234567\",\n  \"email\": \"marco@italiankitchen.com\",\n  \"address\": \"123 Main St\",\n  \"cuisine_types\": [\"Italian\", \"Pasta\"],\n  \"business_registration\": \"base64_encoded_file\",\n  \"tax_id\": \"TAX123456\"\n}"
-            },
-            "url": {
-              "raw": "{{base_url}}/partner/restaurant/apply",
-              "host": ["{{base_url}}"],
-              "path": ["partner", "restaurant", "apply"]
-            }
-          },
-          "response": []
-        },
-        {
-          "name": "Submit B2B Application",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"company_name\": \"Food Wholesale Ltd\",\n  \"contact_person\": \"John Smith\",\n  \"phone\": \"+992901234567\",\n  \"email\": \"contact@foodwholesale.com\",\n  \"business_type\": \"wholesale_supplier\",\n  \"tax_certificate\": \"base64_encoded_file\",\n  \"company_registration\": \"base64_encoded_file\"\n}"
-            },
-            "url": {
-              "raw": "{{base_url}}/partner/b2b/apply",
-              "host": ["{{base_url}}"],
-              "path": ["partner", "b2b", "apply"]
-            }
-          },
-          "response": []
+          }
         }
       ]
     }
   ],
-  "event": [],
   "variable": [
-    {
-      "key": "base_url",
-      "value": "http://localhost:8000/api/v1",
-      "type": "string",
-      "description": "Base API URL - change to production URL for live testing"
-    },
-    {
-      "key": "customer_token",
-      "value": "",
-      "type": "string",
-      "description": "Customer authentication token (set after login)"
-    },
-    {
-      "key": "driver_token",
-      "value": "",
-      "type": "string",
-      "description": "Driver query parameter token (set after driver login)"
-    },
-    {
-      "key": "vendor_token",
-      "value": "",
-      "type": "string",
-      "description": "Vendor Bearer token (set after vendor login)"
-    },
-    {
-      "key": "order_id",
-      "value": "123",
-      "type": "string",
-      "description": "Order ID for testing order-specific endpoints"
-    },
-    {
-      "key": "restaurant_id",
-      "value": "1",
-      "type": "string",
-      "description": "Restaurant ID for browsing products"
-    },
-    {
-      "key": "product_id",
-      "value": "5",
-      "type": "string",
-      "description": "Product ID for fetching product details"
-    },
-    {
-      "key": "customer_id",
-      "value": "",
-      "type": "string",
-      "description": "Customer user ID (set during login)"
-    },
-    {
-      "key": "driver_id",
-      "value": "",
-      "type": "string",
-      "description": "Driver user ID (set during driver login)"
-    },
-    {
-      "key": "vendor_id",
-      "value": "",
-      "type": "string",
-      "description": "Vendor ID (set during vendor login)"
-    }
+    { "key": "base_url", "value": "http://localhost:8000/api/v1" },
+    { "key": "base_url_v3", "value": "http://localhost:8000/api/v3" },
+    { "key": "customer_phone", "value": "+992901234567" },
+    { "key": "customer_otp", "value": "123456" },
+    { "key": "customer_token", "value": "" },
+    { "key": "driver_phone", "value": "+992912345678" },
+    { "key": "driver_otp", "value": "123456" },
+    { "key": "driver_token", "value": "" },
+    { "key": "order_id", "value": "1" }
   ]
 }

@@ -34,6 +34,7 @@ Open the imported environment and set:
 
 ```
 base_url = http://localhost:8000/api/v1  # or https://api.zaza.tj/api/v1 for production
+base_url_v3 = http://localhost:8000/api/v3  # or https://api.zaza.tj/api/v3 for production
 customer_token = (will be auto-populated after login)
 restaurant_id = 1
 order_id = 1
@@ -55,13 +56,19 @@ order_id = 1
 
 ## 📚 API Endpoints (25+ total)
 
-### Authentication (3 endpoints)
+### Authentication (OTP-only)
 
-#### Send OTP
+Новый поток для обычных пользователей полностью без пароля, email и nickname:
+
+1. Ввести `phone`
+2. Отправить запрос на OTP
+3. Ввести `otp`
+4. Получить `token` и войти
+
+#### V1 Sign-Up (request OTP)
 ```
-POST /auth/send-otp
+POST /auth/sign-up
 ```
-Send one-time password to customer's phone
 
 **Request:**
 ```json
@@ -70,19 +77,31 @@ Send one-time password to customer's phone
 }
 ```
 
-**Response:**
+**Response (200):**
 ```json
 {
-  "success": true,
-  "message": "OTP sent to your phone"
+  "message": "OTP sent successfully",
+  "is_phone_verified": 0,
+  "phone_verify_end_url": "api/v1/auth/verify-phone"
 }
 ```
 
-#### Verify OTP & Login
+#### V1 Login (request OTP)
 ```
-POST /auth/verify-otp
+POST /auth/login
 ```
-Verify OTP and get authentication token
+
+**Request:**
+```json
+{
+  "phone": "+992912345678"
+}
+```
+
+#### V1 Verify Phone (complete login)
+```
+POST /auth/verify-phone
+```
 
 **Request:**
 ```json
@@ -92,40 +111,65 @@ Verify OTP and get authentication token
 }
 ```
 
-**Response:**
+**Response (200):**
 ```json
 {
-  "success": true,
-  "data": {
-    "user": {
-      "id": 1,
-      "firstname": "John",
-      "lastname": "Doe",
-      "email": "john@example.com",
-      "phone": "+992912345678",
-      "image": "https://api.zaza.tj/images/profile.jpg",
-      "created_at": "2024-01-15T10:30:00Z"
-    },
-    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+  "message": "phone_number_varified_successfully",
+  "token": "<access_token>",
+  "is_phone_verified": 1,
+  "user": {
+    "id": 1,
+    "phone": "+992912345678",
+    "email": "+992912345678@placeholder.zaza"
   }
 }
 ```
 
-#### Register
+#### V3 Register/Login (request OTP)
 ```
-POST /auth/register
+POST /register
+POST /login
 ```
-Create new customer account
+
+**Request (same for both):**
+```json
+{
+  "phone": "+992912345678"
+}
+```
+
+#### V3 Verify Phone (complete login)
+```
+POST /verify-phone
+```
 
 **Request:**
 ```json
 {
   "phone": "+992912345678",
-  "firstname": "John",
-  "lastname": "Doe",
-  "email": "john@example.com"
+  "otp": "123456"
 }
 ```
+
+**Response (200):**
+```json
+{
+  "token": "<access_token>",
+  "message": "Авторизация выполнена успешно",
+  "user": {
+    "id": 1,
+    "phone": "+992912345678",
+    "is_phone_verified": 1
+  }
+}
+```
+
+#### Legacy compatibility endpoints
+```
+POST /auth/customer/send-otp
+POST /auth/customer/verify-otp
+```
+Эти endpoint-ы оставлены для старых клиентов.
 
 ---
 
@@ -512,6 +556,7 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
 ```json
 {
   "base_url": "http://localhost:8000/api/v1",
+  "base_url_v3": "http://localhost:8000/api/v3",
   "customer_token": "",
   "restaurant_id": "1",
   "order_id": "1"
@@ -521,9 +566,9 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
 ### Test Workflow
 
 ```
-1. POST /auth/send-otp (phone)
+1. POST /auth/sign-up (phone) or POST /auth/login (phone)
    ↓
-2. POST /auth/verify-otp (phone, otp) → token saved
+2. POST /auth/verify-phone (phone, otp) → token saved
    ↓
 3. GET /restaurants (browse)
    ↓

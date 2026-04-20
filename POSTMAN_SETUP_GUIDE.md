@@ -58,6 +58,7 @@
 
 ```
 ✓ base_url         → http://localhost:8000/api/v1
+✓ base_url_v3      → http://localhost:8000/api/v3
 ✓ customer_token   → (пусто, заполнится после входа)
 ✓ driver_token     → (пусто, заполнится после входа)
 ✓ vendor_token     → (пусто, заполнится после входа)
@@ -72,18 +73,19 @@
 
 ### Для Customers (Клиентов)
 
-1. **Отправьте OTP запрос**
-   - Откройте: `🔐 Authentication > Customer - Send OTP`
-   - Измените номер телефона в body (если нужно)
+1. **Запросите OTP (v1 или v3)**
+   - Вариант v1: `🔐 Authentication > V1 Sign-Up (Send OTP)` или `V1 Login (Send OTP)`
+   - Вариант v3: `🔐 Authentication > V3 Register (Send OTP)` или `V3 Login (Send OTP)`
+   - Передайте только `phone`
    - Нажмите **"Send"**
-   - Скопируйте значение `data.reference` из ответа
+   - Если включен debug mode, OTP автоматически сохранится в `customer_otp`
 
-2. **Верифицируйте OTP**
-   - Откройте: `🔐 Authentication > Customer - Verify OTP & Login`
-   - Вставьте номер телефона
-   - Вставьте код OTP (обычно `123456` в development)
+2. **Подтвердите OTP и войдите**
+   - Вариант v1: `🔐 Authentication > V1 Verify Phone (Complete Login)`
+   - Вариант v3: `🔐 Authentication > V3 Verify Phone (Complete Login)`
+   - Передайте `phone` и `otp`
    - Нажмите **"Send"**
-   - **Автоматически** сохранится `customer_token` в переменные окружения
+   - `customer_token` автоматически сохранится в environment
 
 3. **Проверьте токен**
    - В верхнем правом углу нажмите на иконку глаза
@@ -247,7 +249,8 @@
 
 ```
 1. Аутентификация
-   POST /auth/customer/verify-otp → получить customer_token
+   POST /auth/sign-up (или /auth/login) → получить OTP
+   POST /auth/verify-phone → получить customer_token
 
 2. Получение адресов
    GET /customer/addresses → выбрать address_id

@@ -113,10 +113,15 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
 ## 🎯 Все 150+ Endpoints в Swagger
 
-### 🔐 Authentication (5 endpoints)
-- `POST /auth/customer/send-otp`
-- `POST /auth/customer/verify-otp`
-- `POST /auth/customer/register`
+### 🔐 Authentication (9+ endpoints)
+- `POST /auth/sign-up` (v1 OTP request)
+- `POST /auth/login` (v1 OTP request)
+- `POST /auth/verify-phone` (v1 OTP verify + token)
+- `POST /register` (v3 OTP request)
+- `POST /login` (v3 OTP request)
+- `POST /verify-phone` (v3 OTP verify + token)
+- `POST /auth/customer/send-otp` (legacy)
+- `POST /auth/customer/verify-otp` (legacy)
 - `POST /auth/delivery-man/send-otp`
 - `POST /auth/delivery-man/verify-otp`
 - `POST /auth/vendor/login`
@@ -205,7 +210,7 @@ Authorization: Bearer YOUR_TOKEN_HERE
 ```
 
 Нужно:
-1. Войти через `/auth/customer/verify-otp`
+1. Войти через `/auth/verify-phone` (v1) или `/verify-phone` (v3)
 2. Скопировать `token` из ответа
 3. Нажать кнопку **"Authorize"** в Swagger UI
 4. Вставить token в формате: `Bearer <token>`

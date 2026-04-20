@@ -1,698 +1,561 @@
 {
-  "openapi": "3.0.0",
+  "openapi": "3.0.3",
   "info": {
     "title": "ZaZa Service API",
-    "description": "Complete API documentation for ZaZa Food Delivery Ecosystem\n\nZaZa is a multi-platform food delivery service supporting:\n- 👥 Customers (Flutter app)\n- 🏪 Restaurants/Vendors\n- 🛵 Delivery Drivers (Flutter app)\n- 📱 Web platforms (React)\n\n**Base URLs:**\n- Development: `http://localhost:8000/api/v1`\n- Production: `https://api.zaza.tj/api/v1`\n\n**Authentication Methods:**\n- Customers & Vendors: Bearer Token (OAuth 2.0)\n- Drivers: Query Parameter Token\n- Public Endpoints: No authentication required",
-    "version": "1.0.0",
-    "contact": {
-      "name": "ZaZa API Support",
-      "email": "dev@zaza.tj"
-    },
-    "license": {
-      "name": "MIT"
-    }
+    "version": "2.1.0",
+    "description": "Unified API document for endpoints currently used by Customer, Driver, and Restaurant frontend applications, including new phone+OTP customer auth flow."
   },
   "servers": [
-    {
-      "url": "http://localhost:8000/api/v1",
-      "description": "Development server"
-    },
-    {
-      "url": "https://api.zaza.tj/api/v1",
-      "description": "Production server"
-    }
+    { "url": "http://localhost:8000/api/v1", "description": "Development" },
+    { "url": "https://api.zaza.tj/api/v1", "description": "Production" },
+    { "url": "http://localhost:8000/api/v3", "description": "Development v3" },
+    { "url": "https://api.zaza.tj/api/v3", "description": "Production v3" }
+  ],
+  "tags": [
+    { "name": "Customer Auth v1" },
+    { "name": "Customer Auth v3" },
+    { "name": "Customer Auth Legacy" },
+    { "name": "Driver Auth" },
+    { "name": "Driver Profile" },
+    { "name": "Driver Orders" },
+    { "name": "Driver Wallet" },
+    { "name": "Partner Request" }
   ],
   "components": {
     "securitySchemes": {
-      "BearerAuth": {
-        "type": "http",
-        "scheme": "bearer",
-        "description": "Bearer token for Customer & Vendor authentication"
-      },
-      "QueryToken": {
-        "type": "apiKey",
-        "name": "token",
-        "in": "query",
-        "description": "Query parameter token for Driver authentication"
-      }
-    },
-    "schemas": {
-      "User": {
-        "type": "object",
-        "properties": {
-          "id": { "type": "integer", "example": 1 },
-          "f_name": { "type": "string", "example": "John" },
-          "l_name": { "type": "string", "example": "Doe" },
-          "phone": { "type": "string", "example": "+992901234567" },
-          "email": { "type": "string", "format": "email", "example": "john@example.com" },
-          "avatar": { "type": "string", "format": "uri" }
-        }
-      },
-      "Order": {
-        "type": "object",
-        "properties": {
-          "id": { "type": "integer", "example": 123 },
-          "customer_id": { "type": "integer" },
-          "restaurant_id": { "type": "integer" },
-          "delivery_address_id": { "type": "integer" },
-          "status": { "type": "string", "enum": ["pending", "confirmed", "preparing", "ready", "on_the_way", "delivered", "cancelled"] },
-          "total_amount": { "type": "number", "format": "float", "example": 45.50 },
-          "estimated_time": { "type": "integer", "description": "Minutes", "example": 35 },
-          "payment_method": { "type": "string", "enum": ["wallet", "card", "cash"] },
-          "created_at": { "type": "string", "format": "date-time" },
-          "updated_at": { "type": "string", "format": "date-time" }
-        }
-      },
-      "Product": {
-        "type": "object",
-        "properties": {
-          "id": { "type": "integer" },
-          "name": { "type": "string", "example": "Margherita Pizza" },
-          "description": { "type": "string" },
-          "price": { "type": "number", "format": "float", "example": 12.99 },
-          "category_id": { "type": "integer" },
-          "restaurant_id": { "type": "integer" },
-          "image_url": { "type": "string", "format": "uri" },
-          "is_available": { "type": "boolean", "example": true },
-          "preparation_time": { "type": "integer", "description": "Minutes" },
-          "rating": { "type": "number", "format": "float", "example": 4.5 },
-          "review_count": { "type": "integer" }
-        }
-      },
-      "Address": {
-        "type": "object",
-        "properties": {
-          "id": { "type": "integer" },
-          "customer_id": { "type": "integer" },
-          "label": { "type": "string", "example": "Home", "enum": ["Home", "Work", "Other"] },
-          "address": { "type": "string", "example": "123 Main Street, Apt 4B" },
-          "latitude": { "type": "number", "format": "float", "example": 37.7749 },
-          "longitude": { "type": "number", "format": "float", "example": -122.4194 },
-          "is_default": { "type": "boolean" }
-        }
-      },
-      "Wallet": {
-        "type": "object",
-        "properties": {
-          "id": { "type": "integer" },
-          "customer_id": { "type": "integer" },
-          "balance": { "type": "number", "format": "float", "example": 250.75 },
-          "total_recharged": { "type": "number", "format": "float" },
-          "total_spent": { "type": "number", "format": "float" },
-          "currency": { "type": "string", "example": "TJS" }
-        }
-      },
-      "Driver": {
-        "type": "object",
-        "properties": {
-          "id": { "type": "integer" },
-          "f_name": { "type": "string" },
-          "l_name": { "type": "string" },
-          "phone": { "type": "string" },
-          "vehicle_type": { "type": "string", "enum": ["bike", "scooter", "car"] },
-          "vehicle_number": { "type": "string" },
-          "status": { "type": "string", "enum": ["active", "inactive", "on_delivery"] },
-          "rating": { "type": "number", "format": "float", "example": 4.8 },
-          "total_deliveries": { "type": "integer" }
-        }
-      },
-      "Restaurant": {
-        "type": "object",
-        "properties": {
-          "id": { "type": "integer" },
-          "name": { "type": "string" },
-          "email": { "type": "string", "format": "email" },
-          "phone": { "type": "string" },
-          "address": { "type": "string" },
-          "latitude": { "type": "number", "format": "float" },
-          "longitude": { "type": "number", "format": "float" },
-          "logo_url": { "type": "string", "format": "uri" },
-          "banner_url": { "type": "string", "format": "uri" },
-          "cuisine_types": { "type": "array", "items": { "type": "string" }, "example": ["Italian", "Pizza"] },
-          "rating": { "type": "number", "format": "float" },
-          "delivery_time": { "type": "integer", "description": "Minutes" },
-          "min_order_amount": { "type": "number", "format": "float" },
-          "is_open": { "type": "boolean" }
-        }
-      },
-      "ApiResponse": {
-        "type": "object",
-        "properties": {
-          "status": { "type": "boolean" },
-          "message": { "type": "string" },
-          "data": { "type": "object" }
-        }
-      }
-    },
-    "parameters": {
-      "PageParam": {
-        "name": "page",
-        "in": "query",
-        "schema": { "type": "integer", "default": 1 },
-        "description": "Page number for pagination"
-      },
-      "LimitParam": {
-        "name": "limit",
-        "in": "query",
-        "schema": { "type": "integer", "default": 10 },
-        "description": "Items per page"
-      }
+      "QueryToken": { "type": "apiKey", "in": "query", "name": "token" },
+      "BearerAuth": { "type": "http", "scheme": "bearer", "bearerFormat": "Token" }
     }
   },
   "paths": {
     "/auth/customer/send-otp": {
       "post": {
-        "tags": ["🔐 Authentication"],
-        "summary": "Send OTP to customer phone",
-        "operationId": "sendCustomerOTP",
+        "tags": ["Customer Auth Legacy"],
+        "summary": "Legacy endpoint: send OTP to customer phone",
         "requestBody": {
           "required": true,
           "content": {
             "application/json": {
               "schema": {
                 "type": "object",
-                "properties": { "phone": { "type": "string", "example": "+992901234567" } },
-                "required": ["phone"]
+                "required": ["phone"],
+                "properties": {
+                  "phone": {
+                    "type": "string",
+                    "minLength": 7,
+                    "maxLength": 20,
+                    "example": "+992901234567"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": { "200": { "description": "OTP sent" }, "422": { "description": "Validation failed" } }
+      }
+    },
+    "/auth/customer/verify-otp": {
+      "post": {
+        "tags": ["Customer Auth Legacy"],
+        "summary": "Legacy endpoint: verify customer OTP",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["phone", "otp"],
+                "properties": {
+                  "phone": { "type": "string", "example": "+992901234567" },
+                  "otp": { "type": "string", "minLength": 6, "maxLength": 6, "example": "123456" }
+                }
               }
             }
           }
         },
         "responses": {
-          "200": { "description": "OTP sent successfully" },
-          "400": { "description": "Invalid phone number" }
+          "200": { "description": "Token and user returned" },
+          "401": { "description": "Invalid OTP" },
+          "404": { "description": "Account not found or disabled" }
         }
       }
     },
-    "/auth/customer/verify-otp": {
+    "/auth/sign-up": {
       "post": {
-        "tags": ["🔐 Authentication"],
-        "summary": "Verify OTP and login customer",
-        "operationId": "verifyCustomerOTP",
+        "tags": ["Customer Auth v1"],
+        "summary": "v1 sign-up: request OTP by phone",
         "requestBody": {
           "required": true,
           "content": {
             "application/json": {
               "schema": {
                 "type": "object",
+                "required": ["phone"],
                 "properties": {
-                  "phone": { "type": "string" },
-                  "otp": { "type": "string" },
-                  "reference": { "type": "string" }
-                },
-                "required": ["phone", "otp", "reference"]
+                  "phone": {
+                    "type": "string",
+                    "minLength": 7,
+                    "maxLength": 20,
+                    "example": "+992901234567"
+                  }
+                }
               }
             }
           }
         },
-        "responses": { "200": { "description": "Login successful" } }
+        "responses": {
+          "200": { "description": "OTP requested" },
+          "403": { "description": "Blocked account or validation error" },
+          "405": { "description": "OTP delivery failed" }
+        }
       }
     },
-    "/auth/customer/register": {
+    "/auth/login": {
       "post": {
-        "tags": ["🔐 Authentication"],
-        "summary": "Register new customer",
+        "tags": ["Customer Auth v1"],
+        "summary": "v1 login: request OTP by phone",
         "requestBody": {
           "required": true,
           "content": {
             "application/json": {
               "schema": {
                 "type": "object",
+                "required": ["phone"],
+                "properties": {
+                  "phone": {
+                    "type": "string",
+                    "minLength": 7,
+                    "maxLength": 20,
+                    "example": "+992901234567"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "OTP requested" },
+          "403": { "description": "Blocked account or validation error" },
+          "405": { "description": "OTP delivery failed" }
+        }
+      }
+    },
+    "/auth/verify-phone": {
+      "post": {
+        "tags": ["Customer Auth v1"],
+        "summary": "v1 verify phone OTP and complete login",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["phone", "otp"],
+                "properties": {
+                  "phone": {
+                    "type": "string",
+                    "example": "+992901234567"
+                  },
+                  "otp": {
+                    "type": "string",
+                    "minLength": 4,
+                    "maxLength": 6,
+                    "example": "123456"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "Authenticated, token returned" },
+          "403": { "description": "Blocked account" },
+          "404": { "description": "Not found or OTP mismatch" }
+        }
+      }
+    },
+    "/register": {
+      "post": {
+        "servers": [
+          { "url": "http://localhost:8000/api/v3", "description": "Development v3" },
+          { "url": "https://api.zaza.tj/api/v3", "description": "Production v3" }
+        ],
+        "tags": ["Customer Auth v3"],
+        "summary": "v3 register: request OTP by phone",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["phone"],
+                "properties": {
+                  "phone": {
+                    "type": "string",
+                    "minLength": 7,
+                    "maxLength": 20,
+                    "example": "+992901234567"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "OTP requested" },
+          "403": { "description": "Blocked account" }
+        }
+      }
+    },
+    "/login": {
+      "post": {
+        "servers": [
+          { "url": "http://localhost:8000/api/v3", "description": "Development v3" },
+          { "url": "https://api.zaza.tj/api/v3", "description": "Production v3" }
+        ],
+        "tags": ["Customer Auth v3"],
+        "summary": "v3 login: request OTP by phone",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["phone"],
+                "properties": {
+                  "phone": {
+                    "type": "string",
+                    "minLength": 7,
+                    "maxLength": 20,
+                    "example": "+992901234567"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "OTP requested" },
+          "403": { "description": "Blocked account" }
+        }
+      }
+    },
+    "/verify-phone": {
+      "post": {
+        "servers": [
+          { "url": "http://localhost:8000/api/v3", "description": "Development v3" },
+          { "url": "https://api.zaza.tj/api/v3", "description": "Production v3" }
+        ],
+        "tags": ["Customer Auth v3"],
+        "summary": "v3 verify phone OTP and complete login",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["phone", "otp"],
+                "properties": {
+                  "phone": {
+                    "type": "string",
+                    "example": "+992901234567"
+                  },
+                  "otp": {
+                    "type": "string",
+                    "minLength": 4,
+                    "maxLength": 6,
+                    "example": "123456"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "Authenticated, token returned" },
+          "401": { "description": "Invalid or expired OTP" },
+          "403": { "description": "Blocked account" }
+        }
+      }
+    },
+    "/auth/delivery-man/send-otp": {
+      "post": {
+        "tags": ["Driver Auth"],
+        "summary": "Send OTP to delivery man phone",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["phone"],
+                "properties": { "phone": { "type": "string" } }
+              }
+            }
+          }
+        },
+        "responses": { "200": { "description": "OTP sent" }, "404": { "description": "Delivery man not found" } }
+      }
+    },
+    "/auth/delivery-man/verify-otp": {
+      "post": {
+        "tags": ["Driver Auth"],
+        "summary": "Verify delivery man OTP",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["phone", "otp"],
                 "properties": {
                   "phone": { "type": "string" },
-                  "f_name": { "type": "string" },
-                  "l_name": { "type": "string" },
-                  "email": { "type": "string" },
-                  "password": { "type": "string" },
                   "otp": { "type": "string" }
                 }
               }
             }
           }
         },
-        "responses": { "201": { "description": "Registration successful" } }
+        "responses": { "200": { "description": "Token and driver returned" }, "401": { "description": "Invalid OTP" } }
       }
     },
-    "/auth/delivery-man/send-otp": {
-      "post": {
-        "tags": ["🔐 Authentication"],
-        "summary": "Send OTP to driver",
-        "requestBody": { "required": true, "content": { "application/json": { "schema": { "type": "object", "properties": { "phone": { "type": "string" } } } } } },
-        "responses": { "200": { "description": "OTP sent" } }
-      }
-    },
-    "/auth/delivery-man/verify-otp": {
-      "post": {
-        "tags": ["🔐 Authentication"],
-        "summary": "Verify OTP and login driver",
-        "requestBody": { "required": true, "content": { "application/json": { "schema": { "type": "object", "properties": { "phone": { "type": "string" }, "otp": { "type": "string" } } } } } },
-        "responses": { "200": { "description": "Driver login successful" } }
-      }
-    },
-    "/auth/vendor/login": {
-      "post": {
-        "tags": ["🔐 Authentication"],
-        "summary": "Vendor login",
-        "requestBody": { "required": true, "content": { "application/json": { "schema": { "type": "object", "properties": { "email": { "type": "string" }, "password": { "type": "string" } } } } } },
-        "responses": { "200": { "description": "Vendor login successful" } }
-      }
-    },
-    "/customer/profile": {
+    "/delivery-man/profile": {
       "get": {
-        "tags": ["👤 Customer"],
-        "summary": "Get customer profile",
-        "security": [{ "BearerAuth": [] }],
-        "responses": { "200": { "description": "Profile retrieved" } }
+        "tags": ["Driver Profile"],
+        "summary": "Get delivery man profile",
+        "security": [{ "QueryToken": [] }, { "BearerAuth": [] }],
+        "responses": { "200": { "description": "Profile object" } }
       }
     },
-    "/customer/profile/update": {
-      "post": {
-        "tags": ["👤 Customer"],
-        "summary": "Update customer profile",
-        "security": [{ "BearerAuth": [] }],
-        "requestBody": { "content": { "application/json": { "schema": { "type": "object" } } } },
-        "responses": { "200": { "description": "Profile updated" } }
-      }
-    },
-    "/customer/orders": {
-      "get": {
-        "tags": ["👤 Customer"],
-        "summary": "Get customer orders",
-        "security": [{ "BearerAuth": [] }],
-        "parameters": [ { "$ref": "#/components/parameters/PageParam" }, { "$ref": "#/components/parameters/LimitParam" } ],
-        "responses": { "200": { "description": "Orders retrieved" } }
-      }
-    },
-    "/customer/order/{order_id}": {
-      "get": {
-        "tags": ["👤 Customer"],
-        "summary": "Get order details",
-        "security": [{ "BearerAuth": [] }],
-        "parameters": [ { "name": "order_id", "in": "path", "required": true, "schema": { "type": "integer" } } ],
-        "responses": { "200": { "description": "Order details retrieved" } }
-      }
-    },
-    "/customer/order/place": {
-      "post": {
-        "tags": ["👤 Customer"],
-        "summary": "Place new order",
-        "security": [{ "BearerAuth": [] }],
+    "/delivery-man/update-profile": {
+      "put": {
+        "tags": ["Driver Profile"],
+        "summary": "Update profile",
+        "security": [{ "QueryToken": [] }, { "BearerAuth": [] }],
         "requestBody": {
           "required": true,
           "content": {
             "application/json": {
               "schema": {
                 "type": "object",
+                "required": ["f_name", "l_name", "email"],
                 "properties": {
-                  "restaurant_id": { "type": "integer" },
-                  "delivery_address_id": { "type": "integer" },
-                  "items": { "type": "array" },
-                  "payment_method": { "type": "string" }
-                }
-              }
-            }
-          }
-        },
-        "responses": { "201": { "description": "Order placed successfully" } }
-      }
-    },
-    "/customer/addresses": {
-      "get": {
-        "tags": ["👤 Customer"],
-        "summary": "Get customer addresses",
-        "security": [{ "BearerAuth": [] }],
-        "responses": { "200": { "description": "Addresses retrieved" } }
-      }
-    },
-    "/customer/address/add": {
-      "post": {
-        "tags": ["👤 Customer"],
-        "summary": "Add new delivery address",
-        "security": [{ "BearerAuth": [] }],
-        "requestBody": { "content": { "application/json": { "schema": { "type": "object" } } } },
-        "responses": { "201": { "description": "Address added" } }
-      }
-    },
-    "/customer/wallet": {
-      "get": {
-        "tags": ["👤 Customer"],
-        "summary": "Get wallet balance",
-        "security": [{ "BearerAuth": [] }],
-        "responses": { "200": { "description": "Wallet retrieved" } }
-      }
-    },
-    "/customer/wallet/add": {
-      "post": {
-        "tags": ["👤 Customer"],
-        "summary": "Add money to wallet",
-        "security": [{ "BearerAuth": [] }],
-        "requestBody": { "content": { "application/json": { "schema": { "type": "object" } } } },
-        "responses": { "200": { "description": "Money added to wallet" } }
-      }
-    },
-    "/customer/wishlist": {
-      "get": {
-        "tags": ["👤 Customer"],
-        "summary": "Get wishlist",
-        "security": [{ "BearerAuth": [] }],
-        "responses": { "200": { "description": "Wishlist retrieved" } }
-      }
-    },
-    "/customer/wishlist/add": {
-      "post": {
-        "tags": ["👤 Customer"],
-        "summary": "Add product to wishlist",
-        "security": [{ "BearerAuth": [] }],
-        "requestBody": { "content": { "application/json": { "schema": { "type": "object", "properties": { "product_id": { "type": "integer" } } } } } },
-        "responses": { "201": { "description": "Product added to wishlist" } }
-      }
-    },
-    "/delivery-man/profile": {
-      "get": {
-        "tags": ["🛵 Driver"],
-        "summary": "Get driver profile",
-        "security": [{ "QueryToken": [] }],
-        "responses": { "200": { "description": "Driver profile retrieved" } }
-      }
-    },
-    "/delivery-man/update-location": {
-      "post": {
-        "tags": ["🛵 Driver"],
-        "summary": "Update driver real-time location",
-        "security": [{ "QueryToken": [] }],
-        "requestBody": { "content": { "application/json": { "schema": { "type": "object" } } } },
-        "responses": { "200": { "description": "Location updated" } }
-      }
-    },
-    "/delivery-man/available-orders": {
-      "get": {
-        "tags": ["🛵 Driver"],
-        "summary": "Get available orders",
-        "security": [{ "QueryToken": [] }],
-        "parameters": [ { "$ref": "#/components/parameters/PageParam" } ],
-        "responses": { "200": { "description": "Available orders retrieved" } }
-      }
-    },
-    "/delivery-man/order/accept": {
-      "post": {
-        "tags": ["🛵 Driver"],
-        "summary": "Accept delivery order",
-        "security": [{ "QueryToken": [] }],
-        "requestBody": { "content": { "application/json": { "schema": { "type": "object", "properties": { "order_id": { "type": "integer" } } } } } },
-        "responses": { "200": { "description": "Order accepted" } }
-      }
-    },
-    "/delivery-man/active-orders": {
-      "get": {
-        "tags": ["🛵 Driver"],
-        "summary": "Get active deliveries",
-        "security": [{ "QueryToken": [] }],
-        "responses": { "200": { "description": "Active orders retrieved" } }
-      }
-    },
-    "/delivery-man/order/update-status": {
-      "post": {
-        "tags": ["🛵 Driver"],
-        "summary": "Update order status",
-        "security": [{ "QueryToken": [] }],
-        "requestBody": { "content": { "application/json": { "schema": { "type": "object" } } } },
-        "responses": { "200": { "description": "Order status updated" } }
-      }
-    },
-    "/delivery-man/order/complete": {
-      "post": {
-        "tags": ["🛵 Driver"],
-        "summary": "Complete delivery",
-        "security": [{ "QueryToken": [] }],
-        "requestBody": { "content": { "application/json": { "schema": { "type": "object" } } } },
-        "responses": { "200": { "description": "Delivery completed" } }
-      }
-    },
-    "/delivery-man/earnings": {
-      "get": {
-        "tags": ["🛵 Driver"],
-        "summary": "Get driver earnings",
-        "security": [{ "QueryToken": [] }],
-        "parameters": [
-          { "name": "from", "in": "query", "schema": { "type": "string", "format": "date" } },
-          { "name": "to", "in": "query", "schema": { "type": "string", "format": "date" } }
-        ],
-        "responses": { "200": { "description": "Earnings retrieved" } }
-      }
-    },
-    "/delivery-man/earnings/withdraw": {
-      "post": {
-        "tags": ["🛵 Driver"],
-        "summary": "Request earnings withdrawal",
-        "security": [{ "QueryToken": [] }],
-        "requestBody": { "content": { "application/json": { "schema": { "type": "object" } } } },
-        "responses": { "200": { "description": "Withdrawal request submitted" } }
-      }
-    },
-    "/vendor/profile": {
-      "get": {
-        "tags": ["🏪 Vendor"],
-        "summary": "Get vendor profile",
-        "security": [{ "BearerAuth": [] }],
-        "responses": { "200": { "description": "Vendor profile retrieved" } }
-      }
-    },
-    "/vendor/products": {
-      "get": {
-        "tags": ["🏪 Vendor"],
-        "summary": "Get vendor products",
-        "security": [{ "BearerAuth": [] }],
-        "parameters": [ { "$ref": "#/components/parameters/PageParam" }, { "$ref": "#/components/parameters/LimitParam" } ],
-        "responses": { "200": { "description": "Products retrieved" } }
-      }
-    },
-    "/vendor/product/add": {
-      "post": {
-        "tags": ["🏪 Vendor"],
-        "summary": "Add new product",
-        "security": [{ "BearerAuth": [] }],
-        "requestBody": { "content": { "application/json": { "schema": { "type": "object" } } } },
-        "responses": { "201": { "description": "Product added" } }
-      }
-    },
-    "/vendor/orders": {
-      "get": {
-        "tags": ["🏪 Vendor"],
-        "summary": "Get vendor orders",
-        "security": [{ "BearerAuth": [] }],
-        "parameters": [ { "$ref": "#/components/parameters/PageParam" } ],
-        "responses": { "200": { "description": "Orders retrieved" } }
-      }
-    },
-    "/vendor/order/confirm": {
-      "post": {
-        "tags": ["🏪 Vendor"],
-        "summary": "Confirm and prepare order",
-        "security": [{ "BearerAuth": [] }],
-        "requestBody": { "content": { "application/json": { "schema": { "type": "object" } } } },
-        "responses": { "200": { "description": "Order confirmed" } }
-      }
-    },
-    "/vendor/earnings": {
-      "get": {
-        "tags": ["🏪 Vendor"],
-        "summary": "Get vendor earnings",
-        "security": [{ "BearerAuth": [] }],
-        "parameters": [
-          { "name": "from", "in": "query", "schema": { "type": "string", "format": "date" } },
-          { "name": "to", "in": "query", "schema": { "type": "string", "format": "date" } }
-        ],
-        "responses": { "200": { "description": "Earnings retrieved" } }
-      }
-    },
-    "/vendor/earnings/payout": {
-      "post": {
-        "tags": ["🏪 Vendor"],
-        "summary": "Request payout",
-        "security": [{ "BearerAuth": [] }],
-        "requestBody": { "content": { "application/json": { "schema": { "type": "object" } } } },
-        "responses": { "200": { "description": "Payout request submitted" } }
-      }
-    },
-    "/vendor/delivery-men": {
-      "get": {
-        "tags": ["🏪 Vendor"],
-        "summary": "Manage delivery men",
-        "security": [{ "BearerAuth": [] }],
-        "responses": { "200": { "description": "Delivery men retrieved" } }
-      }
-    },
-    "/restaurants": {
-      "get": {
-        "tags": ["📦 Public"],
-        "summary": "Search restaurants",
-        "parameters": [
-          { "name": "search", "in": "query", "schema": { "type": "string" } },
-          { "$ref": "#/components/parameters/PageParam" },
-          { "$ref": "#/components/parameters/LimitParam" }
-        ],
-        "responses": { "200": { "description": "Restaurants retrieved" } }
-      }
-    },
-    "/restaurant/{restaurant_id}": {
-      "get": {
-        "tags": ["📦 Public"],
-        "summary": "Get restaurant details",
-        "parameters": [ { "name": "restaurant_id", "in": "path", "required": true, "schema": { "type": "integer" } } ],
-        "responses": { "200": { "description": "Restaurant details retrieved" } }
-      }
-    },
-    "/products": {
-      "get": {
-        "tags": ["📦 Public"],
-        "summary": "Get products",
-        "parameters": [
-          { "name": "restaurant_id", "in": "query", "schema": { "type": "integer" } },
-          { "$ref": "#/components/parameters/PageParam" }
-        ],
-        "responses": { "200": { "description": "Products retrieved" } }
-      }
-    },
-    "/product/{product_id}": {
-      "get": {
-        "tags": ["📦 Public"],
-        "summary": "Get product details",
-        "parameters": [ { "name": "product_id", "in": "path", "required": true, "schema": { "type": "integer" } } ],
-        "responses": { "200": { "description": "Product details retrieved" } }
-      }
-    },
-    "/categories": {
-      "get": {
-        "tags": ["📦 Public"],
-        "summary": "Get all categories",
-        "responses": { "200": { "description": "Categories retrieved" } }
-      }
-    },
-    "/banners": {
-      "get": {
-        "tags": ["📦 Public"],
-        "summary": "Get promotional banners",
-        "responses": { "200": { "description": "Banners retrieved" } }
-      }
-    },
-    "/coupons": {
-      "get": {
-        "tags": ["📦 Public"],
-        "summary": "Get available coupons",
-        "parameters": [ { "$ref": "#/components/parameters/PageParam" } ],
-        "responses": { "200": { "description": "Coupons retrieved" } }
-      }
-    },
-    "/coupon/validate": {
-      "post": {
-        "tags": ["📦 Public"],
-        "summary": "Validate coupon code",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "coupon_code": { "type": "string" },
-                  "order_total": { "type": "number" },
-                  "restaurant_id": { "type": "integer" }
-                }
-              }
-            }
-          }
-        },
-        "responses": { "200": { "description": "Coupon is valid" }, "400": { "description": "Coupon is invalid" } }
-      }
-    },
-    "/zones": {
-      "get": {
-        "tags": ["⚙️ Configuration"],
-        "summary": "Get delivery zones",
-        "responses": { "200": { "description": "Zones retrieved" } }
-      }
-    },
-    "/delivery/calculate-charge": {
-      "post": {
-        "tags": ["⚙️ Configuration"],
-        "summary": "Calculate delivery charge",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "from_latitude": { "type": "number" },
-                  "from_longitude": { "type": "number" },
-                  "to_latitude": { "type": "number" },
-                  "to_longitude": { "type": "number" }
-                }
-              }
-            }
-          }
-        },
-        "responses": { "200": { "description": "Delivery charge calculated" } }
-      }
-    },
-    "/geocode/reverse": {
-      "get": {
-        "tags": ["⚙️ Configuration"],
-        "summary": "Reverse geocoding",
-        "parameters": [
-          { "name": "latitude", "in": "query", "required": true, "schema": { "type": "number" } },
-          { "name": "longitude", "in": "query", "required": true, "schema": { "type": "number" } }
-        ],
-        "responses": { "200": { "description": "Address retrieved" } }
-      }
-    },
-    "/config": {
-      "get": {
-        "tags": ["⚙️ Configuration"],
-        "summary": "Get system configuration",
-        "responses": { "200": { "description": "Configuration retrieved" } }
-      }
-    },
-    "/partner/restaurant/apply": {
-      "post": {
-        "tags": ["📝 Partner"],
-        "summary": "Submit restaurant partnership application",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "restaurant_name": { "type": "string" },
-                  "owner_name": { "type": "string" },
-                  "phone": { "type": "string" },
+                  "f_name": { "type": "string" },
+                  "l_name": { "type": "string" },
                   "email": { "type": "string" },
+                  "password": { "type": "string" }
+                }
+              }
+            }
+          }
+        },
+        "responses": { "200": { "description": "Updated" } }
+      }
+    },
+    "/delivery-man/update-fcm-token": {
+      "put": {
+        "tags": ["Driver Profile"],
+        "summary": "Update FCM token",
+        "security": [{ "QueryToken": [] }, { "BearerAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["fcm_token"],
+                "properties": { "fcm_token": { "type": "string" } }
+              }
+            }
+          }
+        },
+        "responses": { "200": { "description": "Updated" } }
+      }
+    },
+    "/delivery-man/latest-orders": {
+      "get": {
+        "tags": ["Driver Orders"],
+        "summary": "Get latest orders",
+        "security": [{ "QueryToken": [] }, { "BearerAuth": [] }],
+        "responses": { "200": { "description": "Order list" } }
+      }
+    },
+    "/delivery-man/current-orders": {
+      "get": {
+        "tags": ["Driver Orders"],
+        "summary": "Get current orders",
+        "security": [{ "QueryToken": [] }, { "BearerAuth": [] }],
+        "responses": { "200": { "description": "Order list" } }
+      }
+    },
+    "/delivery-man/all-orders": {
+      "get": {
+        "tags": ["Driver Orders"],
+        "summary": "Get all orders",
+        "security": [{ "QueryToken": [] }, { "BearerAuth": [] }],
+        "responses": { "200": { "description": "Order list" } }
+      }
+    },
+    "/delivery-man/order-delivery-history": {
+      "get": {
+        "tags": ["Driver Orders"],
+        "summary": "Get order-delivery history",
+        "description": "Without order_id returns paginated orders; with order_id returns location history.",
+        "security": [{ "QueryToken": [] }, { "BearerAuth": [] }],
+        "parameters": [
+          { "name": "order_id", "in": "query", "required": false, "schema": { "type": "integer" } },
+          { "name": "limit", "in": "query", "required": false, "schema": { "type": "integer" } },
+          { "name": "offset", "in": "query", "required": false, "schema": { "type": "integer" } }
+        ],
+        "responses": { "200": { "description": "History payload" } }
+      }
+    },
+    "/delivery-man/accept-order": {
+      "put": {
+        "tags": ["Driver Orders"],
+        "summary": "Accept order",
+        "security": [{ "QueryToken": [] }, { "BearerAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["order_id"],
+                "properties": { "order_id": { "type": "integer" } }
+              }
+            }
+          }
+        },
+        "responses": { "200": { "description": "Accepted" } }
+      }
+    },
+    "/delivery-man/update-order-status": {
+      "put": {
+        "tags": ["Driver Orders"],
+        "summary": "Update order status",
+        "security": [{ "QueryToken": [] }, { "BearerAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["order_id", "status"],
+                "properties": {
+                  "order_id": { "type": "integer" },
+                  "status": { "type": "string", "enum": ["confirmed", "canceled", "picked_up", "delivered"] },
+                  "otp": { "type": "string" }
+                }
+              }
+            }
+          }
+        },
+        "responses": { "200": { "description": "Updated" } }
+      }
+    },
+    "/delivery-man/update-active-status": {
+      "post": {
+        "tags": ["Driver Profile"],
+        "summary": "Toggle active status",
+        "security": [{ "QueryToken": [] }, { "BearerAuth": [] }],
+        "responses": { "200": { "description": "Updated" } }
+      }
+    },
+    "/delivery-man/record-location-data": {
+      "post": {
+        "tags": ["Driver Orders"],
+        "summary": "Record location",
+        "security": [{ "QueryToken": [] }, { "BearerAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["latitude", "longitude"],
+                "properties": {
+                  "latitude": { "type": "number" },
+                  "longitude": { "type": "number" },
+                  "location": { "type": "string" }
+                }
+              }
+            }
+          }
+        },
+        "responses": { "200": { "description": "Recorded" } }
+      }
+    },
+    "/delivery-man/request-withdraw": {
+      "post": {
+        "tags": ["Driver Wallet"],
+        "summary": "Request withdraw",
+        "security": [{ "QueryToken": [] }, { "BearerAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["amount"],
+                "properties": { "amount": { "type": "number", "minimum": 0.01 } }
+              }
+            }
+          }
+        },
+        "responses": { "200": { "description": "Request placed" }, "403": { "description": "Insufficient balance" } }
+      }
+    },
+    "/partner-request/restaurant": {
+      "post": {
+        "tags": ["Partner Request"],
+        "summary": "Submit restaurant partner request",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["merchant_name", "phone"],
+                "properties": {
+                  "merchant_name": { "type": "string" },
+                  "contact_name": { "type": "string" },
+                  "phone": { "type": "string" },
+                  "email": { "type": "string", "format": "email" },
+                  "city": { "type": "string" },
                   "address": { "type": "string" }
                 }
               }
             }
           }
         },
-        "responses": { "201": { "description": "Application submitted" } }
+        "responses": { "201": { "description": "Created" }, "422": { "description": "Validation failed" } }
       }
     },
-    "/partner/b2b/apply": {
+    "/partner-request/b2b": {
       "post": {
-        "tags": ["📝 Partner"],
-        "summary": "Submit B2B partnership application",
+        "tags": ["Partner Request"],
+        "summary": "Submit B2B delivery request",
         "requestBody": {
+          "required": true,
           "content": {
             "application/json": {
               "schema": {
                 "type": "object",
+                "required": ["company_name", "contact_name", "phone", "email"],
                 "properties": {
                   "company_name": { "type": "string" },
-                  "contact_person": { "type": "string" },
+                  "contact_name": { "type": "string" },
                   "phone": { "type": "string" },
-                  "email": { "type": "string" }
+                  "email": { "type": "string", "format": "email" },
+                  "city": { "type": "string" },
+                  "description": { "type": "string" }
                 }
               }
             }
           }
         },
-        "responses": { "201": { "description": "B2B application submitted" } }
+        "responses": { "201": { "description": "Created" }, "422": { "description": "Validation failed" } }
       }
     }
   }
